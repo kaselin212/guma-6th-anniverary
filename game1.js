@@ -106,11 +106,22 @@ function showFloatingText(x, y, text, color) {
 
 function checkWin() {
     if (score >= TARGET_SCORE) {
-        // 簡單的獲勝提示，之後您可以改成漂亮的 Modal
+        // 1. 停止遊戲 (不讓小兵繼續扣血或生怪)
+        // 這裡做一個簡單的處理：把生怪頻率設為極大，或是清除所有 interval
+        // 為了簡單起見，我們直接顯示視窗，遊戲背景繼續動也沒關係，反而有動態感
+        
+        // 2. 獲取 Modal 元素
+        const modal = document.getElementById('victory-modal');
+        
+        // 3. 顯示遮罩 (display: flex)
+        modal.style.display = 'flex';
+        
+        // 4. 延遲一點點加上 show class，觸發 CSS 的淡入動畫 (Fade In)
         setTimeout(() => {
-            alert("恭喜解鎖：2020 出道回憶！(按確定返回主選單)");
-            location.href = 'index.html';
-        }, 500);
+            modal.classList.add('show');
+        }, 10);
+        
+        // 5. 播放一個音效? (之後可以加)
     }
 }
 

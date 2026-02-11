@@ -72,6 +72,99 @@
             background: #f1c40f; /* 斬殺線變黃 */
             box-shadow: 0 0 8px #f1c40f;
         }
+        /* --- Modal 相關樣式 --- */
+        /* 背景遮罩 */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85); /* 深色半透明背景 */
+            display: none; /* 預設隱藏 */
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px); /* 背景模糊效果 */
+        }
+
+        /* 卡片本體 */
+        .modal-card {
+            background: linear-gradient(145deg, #1a1a1a, #0d0d0d);
+            border: 2px solid var(--t1-gold); /* 金色邊框 */
+            width: 90%;
+            max-width: 400px;
+            padding: 30px;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(198, 156, 109, 0.3); /* 金色發光 */
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.5s ease-out;
+        }
+
+        /* 顯示時的動畫狀態 */
+        .modal-overlay.show .modal-card {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .modal-header h2 {
+            color: var(--t1-gold);
+            margin: 0;
+            font-size: 1.8rem;
+            letter-spacing: 2px;
+        }
+
+        .sub-title {
+            color: #666;
+            font-size: 0.8rem;
+            letter-spacing: 4px;
+            margin-top: 5px;
+            text-transform: uppercase;
+        }
+
+        .memory-image-placeholder {
+            background: #222;
+            height: 150px;
+            margin: 20px 0;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border: 1px dashed #444;
+            color: #555;
+        }
+
+        .story-text {
+            color: #ccc;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        /* 按鈕樣式微調 */
+        .btn-small {
+            padding: 10px 20px;
+            border: 1px solid var(--t1-red);
+            background: transparent;
+            color: var(--t1-red);
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            margin: 0 5px;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-small.filled {
+            background: var(--t1-red);
+            color: white;
+        }
+
+        .btn-small:hover {
+            transform: scale(1.05);
+        }
     </style>
 </head>
 <body>
@@ -87,6 +180,33 @@
                 <div class="cs-score">CS: <span id="score-val">0</span></div>
             </div>
             </div>
+    </div>
+
+    <div id="victory-modal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2>CHAPTER 1 CLEARED</h2>
+                <div class="sub-title">THE MONSTER ROOKIE</div>
+            </div>
+            
+            <div class="modal-body">
+                <div class="memory-image-placeholder">
+                    <span style="font-size: 3rem;">2020</span>
+                    <p>9.08 Debut</p>
+                </div>
+                
+                <p class="story-text">
+                    "Gumayusi is distinct!"<br>
+                    2020年，一位自信滿滿的新人在區域資格賽橫空出世。<br>
+                    他的凱特琳與達瑞文，讓世界記住了這個名字。
+                </p>
+            </div>
+
+            <div class="modal-footer">
+                <button onclick="location.reload()" class="btn-small">↺ Replay</button>
+                <a href="index.html" class="btn-small filled">Next Chapter →</a>
+            </div>
+        </div>
     </div>
 
     <script src="game1.js"></script>
