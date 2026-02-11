@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chapter 1: The Debut</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* 遊戲專屬樣式 */
         #game-container {
@@ -33,44 +34,67 @@
             color: var(--t1-gold);
         }
 
-        /* 小兵樣式 */
+        /* 修改小兵樣式：不再是紅色圓形，而是容器 */
         .minion {
             position: absolute;
-            width: 60px;
+            width: 60px;  /* 設定容器大小 */
             height: 60px;
-            background: #E4002B; /* 紅色方塊 */
-            border-radius: 50%; /* 變成圓形 */
             cursor: crosshair;
-            transition: transform 0.1s;
-            /* 讓小兵本身可以置中血條 */
             display: flex; 
             justify-content: center;
+            align-items: center;
+            
+            /* Font Awesome 的樣式設定 */
+            color: #ff9f43; /* 披薩的顏色 (橘黃色) */
+            font-size: 3rem; /* 圖示大小 */
+            filter: drop-shadow(0 0 5px rgba(0,0,0,0.5)); /* 加一點陰影比較立體 */
+            transition: transform 0.1s;
         }
 
         .minion:active {
-            transform: scale(0.9); /* 點擊時縮小一點點，增加打擊感 */
+            transform: scale(0.9);
         }
 
+        /* 確保血條還是在頭上 */
         .hp-bar-container {
             position: absolute;
-            top: -15px;
+            top: -10px; /* 稍微往上調一點，避開披薩尖端 */
             width: 60px;
-            height: 8px;
+            height: 10px;
             background: #333;
-            border-radius: 4px;
+            border: 1px solid #000;
+            /* 其他保持不變 */
         }
 
+        /* 這是新的：用來畫分隔線的圖層 */
+        .hp-grid-overlay {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 2; /* 蓋在綠色血條上面 */
+            /* 利用漸層畫出黑色分隔線：每 20% 一條線 (模擬 5 格血) */
+            background: repeating-linear-gradient(
+                to right,
+                transparent,
+                transparent 19%, 
+                rgba(0,0,0,0.5) 19.5%,
+                rgba(0,0,0,0.5) 20%
+            );
+            pointer-events: none;
+        }
+
+        /* 修改這段 */
         .hp-bar-fill {
             height: 100%;
             background: #2ecc71;
             width: 100%;
-            border-radius: 4px;
-            transition: width 0.1s linear, background-color 0.2s;
+            /* 關鍵改動：移除了 transition，這樣扣血會"瞬間"跳動，更有打擊感 */
+            /* transition: width 0.1s linear; <--- 刪掉這行 */ 
         }
 
+        /* 斬殺線顏色 */
         .hp-bar-fill.executable {
-            background: #f1c40f; /* 斬殺線變黃 */
-            box-shadow: 0 0 8px #f1c40f;
+            background: #f1c40f; 
         }
         /* --- Modal 相關樣式 --- */
         /* 背景遮罩 */
@@ -164,6 +188,27 @@
 
         .btn-small:hover {
             transform: scale(1.05);
+        }
+        /* 在 style.css 最下面加入這個 */
+
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(3px, 1px) rotate(-1deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(1px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+
+        /* 這是我們要用 JS 加上去的 class */
+        .minion.hit {
+            animation: shake 0.2s; /* 抖動 0.2 秒 */
+            filter: brightness(1.2) sepia(1) hue-rotate(-50deg) saturate(3); /* 被打時瞬間變亮/變紅 */
         }
     </style>
 </head>

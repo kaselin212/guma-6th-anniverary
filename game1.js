@@ -1,86 +1,151 @@
 const container = document.getElementById('game-container');
 const scoreEl = document.getElementById('score-val');
 let score = 0;
-const TARGET_SCORE = 10; // 目標分數
+const TARGET_SCORE = 10;
+const DAMAGE = 200; 
+let gameActive = true;
 
-// 設定參數
-const DAMAGE = 200; // 你的攻擊力
-const SPAWN_RATE = 1500; // 每1.5秒生一隻
+// 小兵尺寸 (用來計算碰撞)
+const MINION_SIZE = 70; // 60px本體 + 10px的安全距離
+
+// --- 核心改動 1: 防止重疊的座標計算函數 ---
+function getSafePosition() {
+    const maxAttempts = 50; // 最多嘗試50次，避免畫面滿了造成死無窮迴圈
+    let attempt = 0;
+    
+    while (attempt < maxAttempts) {
+        // 1. 隨機生成座標
+        const x = Math.random() * (740); // 容器寬800 - 60
+        const y = Math.random() * (440); // 容器高500 - 60
+        
+        // 2. 檢查是否跟現有的任何一隻小兵重疊
+        let collision = false;
+        const existingMinions = document.querySelectorAll('.minion');
+        
+        for (let m of existingMinions) {
+            const rect = m.getBoundingClientRect();
+            // 取得現有小兵的座標 (相對於遊戲容器)
+            // 注意：這裡簡單計算，用 style.left/top 比較快
+            const mx = parseFloat(m.style.left);
+            const my = parseFloat(m.style.top);
+            
+            // 計算兩點距離 (畢氏定理)
+            const dist = Math.hypot(x - mx, y - my);
+            
+            // 如果距離太近 (小於兩隻小兵的寬度)，就算重疊
+            if (dist < MINION_SIZE) {
+                collision = true;
+                break; // 撞到了，不用檢查其他的，直接換下一個位置
+            }
+        }
+        
+        // 3. 如果沒撞到，這就是好位置！
+        if (!collision) {
+            return { x, y };
+        }
+        
+        attempt++;
+    }
+    
+    // 如果試了50次都找不到位置 (畫面太擠)，這次就不生成
+    return null;
+}
+
+function scheduleNextSpawn() {
+    if (!gameActive) return;
+    const randomDelay = Math.random() * 1000 + 500; 
+    setTimeout(() => {
+        spawnMinion();
+        scheduleNextSpawn(); 
+    }, randomDelay);
+}
 
 function spawnMinion() {
-    // 1. 建立 DOM
+    if (!gameActive) return;
+
+    // --- 呼叫上面的新函數取得位置 ---
+    const pos = getSafePosition();
+    
+    // 如果回傳 null (找不到位置)，這次就跳過
+    if (!pos) return; 
+
     const minion = document.createElement('div');
     minion.classList.add('minion');
     
-    // 2. 隨機位置 (扣除邊界)
-    const x = Math.random() * (740); // 800 - 60
-    const y = Math.random() * (440); // 500 - 60
-    minion.style.left = x + 'px';
-    minion.style.top = y + 'px';
+    // --- 核心改動 2: 插入 Font Awesome 圖示 ---
+    // 這裡我們直接插入 HTML 字串，包含 i 標籤
+    minion.innerHTML = '<i class="fa-solid fa-pizza-slice"></i>';
+    
+    minion.style.left = pos.x + 'px';
+    minion.style.top = pos.y + 'px';
 
-    // 3. 血條結構
+    // 建立血條 (注意：現在要 append 到 minion 裡面，不要蓋掉 icon)
     const hpContainer = document.createElement('div');
     hpContainer.classList.add('hp-bar-container');
+    
+    const gridOverlay = document.createElement('div');
+    gridOverlay.classList.add('hp-grid-overlay');
+    hpContainer.appendChild(gridOverlay);
+
     const hpFill = document.createElement('div');
     hpFill.classList.add('hp-bar-fill');
     hpContainer.appendChild(hpFill);
-    minion.appendChild(hpContainer);
     
+    minion.appendChild(hpContainer);
     container.appendChild(minion);
 
-    // 4. 小兵數據
+    // --- 以下是原本的扣血邏輯 (保持不變) ---
     let hp = 1000;
     const maxHp = 1000;
     let isDead = false;
 
-    // 5. 扣血迴圈 (模擬被其他小兵打)
-    const decay = setInterval(() => {
-        if (isDead) { clearInterval(decay); return; }
+    function takeDamageLoop() {
+        if (isDead || !gameActive) return;
+        const nextHitTime = Math.random() * 1100 + 400; 
 
-        hp -= Math.random() * 8 + 2; // 隨機扣血
-        
-        // 更新 UI
-        const pct = (hp / maxHp) * 100;
-        hpFill.style.width = pct + '%';
+        setTimeout(() => {
+            if (isDead || !gameActive) return;
+            const damageChunk = Math.random() * 70 + 50; 
+            hp -= damageChunk;
+            const pct = (hp / maxHp) * 100;
+            hpFill.style.width = Math.max(0, pct) + '%';
+            
+            // 受擊動畫
+            minion.classList.add('hit');
+            setTimeout(() => minion.classList.remove('hit'), 200);
 
-        // 斬殺線判定
-        if (hp <= DAMAGE) {
-            hpFill.classList.add('executable');
-        }
+            if (hp <= DAMAGE) hpFill.classList.add('executable');
 
-        // 自然死亡 (漏刀)
-        if (hp <= 0) {
-            clearInterval(decay);
-            minion.remove();
-            showFloatingText(x, y, "Miss...", "gray");
-        }
-    }, 50);
+            if (hp <= 0) {
+                isDead = true;
+                minion.remove();
+                showFloatingText(pos.x, pos.y, "Miss...", "gray");
+            } else {
+                takeDamageLoop();
+            }
+        }, nextHitTime);
+    }
 
-    // 6. 點擊事件 (攻擊)
+    takeDamageLoop();
+
     minion.addEventListener('mousedown', () => {
         if (isDead) return;
 
         if (hp <= DAMAGE) {
-            // 成功尾刀
             isDead = true;
-            clearInterval(decay);
             score++;
             scoreEl.innerText = score;
-            showFloatingText(x, y, "+21g", "gold");
-            minion.style.transform = "scale(0)"; // 縮小消失動畫
-            setTimeout(() => minion.remove(), 200);
-
-            // 檢查是否通關
+            showFloatingText(pos.x, pos.y, "+21g", "gold");
+            minion.style.transition = "transform 0.1s";
+            minion.style.transform = "scale(0)";
+            setTimeout(() => minion.remove(), 100);
             checkWin();
         } else {
-            // 太早打
-            showFloatingText(x, y, "Too Early!", "red");
-            // 可以在這裡做懲罰，例如小兵回血或扣分
+            showFloatingText(pos.x, pos.y, "Too Early!", "red");
         }
     });
 }
 
-// 浮動文字特效
 function showFloatingText(x, y, text, color) {
     const el = document.createElement('div');
     el.innerText = text;
@@ -92,38 +157,21 @@ function showFloatingText(x, y, text, color) {
     el.style.pointerEvents = 'none';
     el.style.transition = 'all 0.8s ease-out';
     el.style.zIndex = 100;
-    
     container.appendChild(el);
-    
-    // 讓瀏覽器有時間渲染初始狀態，再加動畫 class
     requestAnimationFrame(() => {
-        el.style.top = (y - 50) + 'px'; // 往上飄
+        el.style.top = (y - 50) + 'px';
         el.style.opacity = 0;
     });
-
     setTimeout(() => el.remove(), 800);
 }
 
 function checkWin() {
     if (score >= TARGET_SCORE) {
-        // 1. 停止遊戲 (不讓小兵繼續扣血或生怪)
-        // 這裡做一個簡單的處理：把生怪頻率設為極大，或是清除所有 interval
-        // 為了簡單起見，我們直接顯示視窗，遊戲背景繼續動也沒關係，反而有動態感
-        
-        // 2. 獲取 Modal 元素
+        gameActive = false;
         const modal = document.getElementById('victory-modal');
-        
-        // 3. 顯示遮罩 (display: flex)
         modal.style.display = 'flex';
-        
-        // 4. 延遲一點點加上 show class，觸發 CSS 的淡入動畫 (Fade In)
-        setTimeout(() => {
-            modal.classList.add('show');
-        }, 10);
-        
-        // 5. 播放一個音效? (之後可以加)
+        setTimeout(() => modal.classList.add('show'), 10);
     }
 }
 
-// 開始遊戲迴圈
-setInterval(spawnMinion, SPAWN_RATE);
+scheduleNextSpawn();
