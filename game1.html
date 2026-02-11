@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 1: The Debut</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* 遊戲專屬樣式 */
+        #game-container {
+            position: relative;
+            width: 800px;
+            height: 500px;
+            border: 2px solid #333;
+            background: #111;
+            margin: 0 auto;
+            overflow: hidden;
+            border-radius: 10px;
+        }
+
+        /* 介面層 (分數、UI) */
+        #ui-layer {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 10;
+            pointer-events: none; /* 讓滑鼠可以穿過文字點擊下面的怪 */
+        }
+
+        .cs-score {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--t1-gold);
+        }
+
+        /* 小兵樣式 */
+        .minion {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: #E4002B; /* 紅色方塊 */
+            border-radius: 50%; /* 變成圓形 */
+            cursor: crosshair;
+            transition: transform 0.1s;
+            /* 讓小兵本身可以置中血條 */
+            display: flex; 
+            justify-content: center;
+        }
+
+        .minion:active {
+            transform: scale(0.9); /* 點擊時縮小一點點，增加打擊感 */
+        }
+
+        .hp-bar-container {
+            position: absolute;
+            top: -15px;
+            width: 60px;
+            height: 8px;
+            background: #333;
+            border-radius: 4px;
+        }
+
+        .hp-bar-fill {
+            height: 100%;
+            background: #2ecc71;
+            width: 100%;
+            border-radius: 4px;
+            transition: width 0.1s linear, background-color 0.2s;
+        }
+
+        .hp-bar-fill.executable {
+            background: #f1c40f; /* 斬殺線變黃 */
+            box-shadow: 0 0 8px #f1c40f;
+        }
+    </style>
+</head>
+<body>
+
+    <div style="width: 100%; max-width: 800px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <a href="index.html" class="btn" style="padding: 5px 15px; font-size: 1rem;">← Back</a>
+            <div style="color: #666;">目標：尾刀 10 隻小兵</div>
+        </div>
+
+        <div id="game-container">
+            <div id="ui-layer">
+                <div class="cs-score">CS: <span id="score-val">0</span></div>
+            </div>
+            </div>
+    </div>
+
+    <script src="game1.js"></script>
+</body>
+</html>

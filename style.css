@@ -1,0 +1,62 @@
+/* style.css */
+:root {
+    --t1-red: #E4002B;
+    --t1-black: #111111;
+    --t1-gold: #C69C6D;
+    --bg-dark: #0a0a0a;
+    --text-white: #ffffff;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-white);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow: hidden; /* 防止捲軸出現 */
+}
+
+/* 通用按鈕樣式 */
+.btn {
+    padding: 12px 24px;
+    background: transparent;
+    border: 2px solid var(--t1-red);
+    color: var(--t1-red);
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none; /* 給 <a> 標籤用 */
+    display: inline-block;
+    margin: 10px;
+}
+
+.btn:hover {
+    background: var(--t1-red);
+    color: white;
+    box-shadow: 0 0 15px rgba(228, 0, 43, 0.5);
+    transform: translateY(-2px);
+}
+
+.btn.disabled {
+    border-color: #555;
+    color: #555;
+    pointer-events: none;
+    cursor: not-allowed;
+}
+
+/* 標題動畫 */
+h1 {
+    font-size: 3rem;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    margin-bottom: 40px;
+    text-align: center;
+    background: linear-gradient(to right, var(--t1-red), var(--t1-gold));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
