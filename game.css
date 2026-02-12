@@ -274,3 +274,120 @@
     opacity: 0;
     transition: all 0.2s;
 }
+
+/* =========================================
+   5. Game 3 專屬樣式 (Kiting / Spacing)
+   ========================================= */
+
+#game-container.mode-kiting {
+    height: 600px;
+    background: #151515;
+    cursor: none; /* 隱藏滑鼠，由角色代替 */
+}
+
+/* 玩家攻擊範圍指示器 (圈圈) */
+.range-indicator {
+    position: absolute;
+    border: 2px dashed rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    /* 範圍半徑由 JS 設定，這裡先給預設 */
+    width: 300px;
+    height: 300px;
+}
+
+/* 進入攻擊範圍時，圈圈變亮 */
+.range-indicator.active {
+    border-color: rgba(228, 0, 43, 0.6); /* T1 Red */
+    background: rgba(228, 0, 43, 0.1);
+}
+
+/* BOSS */
+.boss {
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    top: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #a020f0; /* 紫色代表虛空或邪惡 */
+    font-size: 4rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    filter: drop-shadow(0 0 15px rgba(160, 32, 240, 0.6));
+    transition: left 0.5s ease-in-out; /* 移動平滑 */
+}
+
+.boss.hit {
+    filter: brightness(2) hue-rotate(90deg); /* 被打時變色 */
+}
+
+/* BOSS 血條 */
+.boss-hp-bar {
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 10px;
+    background: #333;
+    border: 1px solid #000;
+}
+
+.boss-hp-fill {
+    width: 100%;
+    height: 100%;
+    background: #a020f0;
+    transition: width 0.2s;
+}
+
+/* 敵方技能 (Skillshot) */
+.skillshot {
+    position: absolute;
+    background: rgba(160, 32, 240, 0.8);
+    box-shadow: 0 0 10px rgba(160, 32, 240, 0.8);
+    border-radius: 4px;
+    /* 大小由 JS 決定 */
+}
+
+/* 玩家子彈 (普攻) */
+.player-bullet {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: var(--t1-gold);
+    border-radius: 50%;
+    box-shadow: 0 0 5px var(--t1-gold);
+}
+
+/* 玩家受傷特效 */
+.player-hit {
+    animation: shake 0.3s;
+    color: red !important;
+}
+
+/* --- Click Marker (點擊地板特效) --- */
+.click-marker {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    border: 2px solid #00ff00; /* 鮮綠色 */
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none; /* 讓滑鼠穿透，不影響點擊 */
+    animation: clickRipple 0.5s ease-out forwards;
+    box-shadow: 0 0 10px #00ff00;
+    opacity: 0.8;
+}
+
+@keyframes clickRipple {
+    0% { width: 10px; height: 10px; opacity: 1; border-width: 3px; }
+    100% { width: 50px; height: 50px; opacity: 0; border-width: 0px; }
+}
+
+/* 讓玩家角色移動時有轉身動畫 */
+#player {
+    transition: transform 0.1s linear; /* 轉身平滑 */
+}

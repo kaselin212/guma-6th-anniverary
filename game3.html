@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 3: The Outplay</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="game.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <div style="width: 100%; max-width: 800px; text-align: center;">
+        <div style="margin-bottom: 10px; display: flex; justify-content: space-between;">
+            <a href="index.html" class="btn" style="padding: 5px 15px; font-size: 1rem;">← Menu</a>
+            <div style="color: #888;">靠近圈圈內自動攻擊，躲避紫色招式！</div>
+        </div>
+
+        <div id="game-container" class="mode-kiting">
+            <div id="ui-layer" style="justify-content: space-between; width: 100%; padding: 20px; box-sizing: border-box;">
+                <div class="stat-box">PLAYER HP: <span id="player-hp" style="color: #2ecc71;">100</span>%</div>
+                <div class="stat-box" style="color: #a020f0;">TARGET: BARON NASHOR</div>
+            </div>
+
+            <div id="range-circle" class="range-indicator"></div>
+
+            <div id="player">
+                <i class="fa-solid fa-feather-pointed"></i>
+            </div>
+
+            <div id="boss" class="boss">
+                <i class="fa-solid fa-dragon"></i>
+                <div class="boss-hp-bar">
+                    <div id="boss-hp-fill" class="boss-hp-fill"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="victory-modal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2>CHAPTER 3 CLEARED</h2>
+                <div class="sub-title">THE OUTPLAY</div>
+            </div>
+            <div class="modal-body">
+                <div class="memory-image-placeholder">
+                    <span style="font-size: 3rem; color: #E4002B;">2022</span>
+                    <p>LCK Spring Champion</p>
+                </div>
+                <p class="story-text">
+                    "Gumayusi is distinct!"<br>
+                    2022年，T1 以全勝之姿奪下春季賽冠軍。<br>
+                    無論面對多少刺客的針對，<br>
+                    他總能在極限距離打出爆炸輸出。
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button onclick="location.reload()" class="btn-small">↺ Retry</button>
+                <a href="index.html" class="btn-small filled">Next Chapter →</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="game3.js"></script>
+</body>
+</html>
