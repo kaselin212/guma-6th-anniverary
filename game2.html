@@ -11,19 +11,21 @@
 </head>
 <body>
 
-    <div style="width: 100%; max-width: 800px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+    <div style="width: 100%; max-width: 800px; text-align: center;">
+        <div style="margin-bottom: 10px; display: flex; justify-content: space-between;">
             <a href="index.html" class="btn" style="padding: 5px 15px; font-size: 1rem;">← Menu</a>
-            <div style="color: #888;">滑鼠移動瞄準，左鍵射擊 (預判敵人的移動！)</div>
+            <div style="color: #888;">滑鼠移動瞄準，點擊射擊 (小心四面八方的敵人！)</div>
         </div>
 
-        <div id="game-container">
+        <div id="game-container" class="mode-sniper">
             <div id="ui-layer">
-                <div class="stat-box">HIT: <span id="score-val" style="color: var(--t1-gold);">0</span>/10</div>
-                <div class="stat-box">AMMO: <span id="ammo-val" style="color: var(--t1-red);">20</span></div>
+                <div class="stat-box">KILLS: <span id="score-val" style="color: var(--t1-gold);">0</span>/15</div>
+                <div class="stat-box">AMMO: <span id="ammo-val" style="color: var(--t1-red);">30</span></div>
             </div>
 
-            <div id="player"><i class="fa-solid fa-location-crosshairs"></i></div>
+            <div id="player">
+                <div id="player-rotate-layer"><i class="fa-solid fa-location-crosshairs"></i></div>
+            </div>
         </div>
     </div>
 
@@ -35,14 +37,13 @@
             </div>
             <div class="modal-body">
                 <div class="memory-image-placeholder">
-                    <span style="font-size: 3rem; color: #E4002B; font-weight: bold;">2021</span>
-                    <p>World Championship Semifinals</p>
+                    <span style="font-size: 3rem; color: #E4002B;">2021</span>
+                    <p>World Championship</p>
                 </div>
                 <p class="story-text">
-                    "Welcome to the big stage."<br>
-                    2021年，Gumayusi 首次站上世界賽舞台。<br>
-                    他的亞菲利歐與法洛士展現了驚人的宰制力，<br>
-                    雖止步四強，但「最強下路組」已初露鋒芒。
+                    面對四面八方的質疑與進攻，<br>
+                    Gumayusi 展現了絕對的自信與操作。<br>
+                    "我會證明我是第一 AD。"
                 </p>
             </div>
             <div class="modal-footer">
