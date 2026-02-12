@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 4: The Steal</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="game.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <div style="width: 100%; max-width: 800px; text-align: center;">
+        <div style="margin-bottom: 10px; display: flex; justify-content: space-between;">
+            <a href="index.html" class="btn" style="padding: 5px 15px; font-size: 1rem;">← Menu</a>
+            <div style="color: #888;">等待血量進入斬殺線，按 <span style="color: var(--t1-gold); font-weight:bold;">SPACE</span> 或 <span style="color: var(--t1-gold); font-weight:bold;">點擊</span> 搶奪！</div>
+        </div>
+
+        <div id="game-container" class="mode-steal">
+            <div style="position: absolute; bottom: 20px; right: 20px; text-align: center; opacity: 0.7;">
+                <div style="border: 2px solid #555; width: 50px; height: 50px; display:flex; align-items:center; justify-content:center; border-radius: 4px; background: #222;">
+                    <i class="fa-solid fa-bow-arrow" style="font-size: 24px; color: var(--t1-red);"></i>
+                </div>
+                <div style="font-size: 12px; margin-top: 5px; color: #888;">SPACE</div>
+            </div>
+
+            <div class="objective-boss">
+                <i class="fa-solid fa-dragon"></i>
+                
+                <div class="baron-hp-container">
+                    <div id="baron-hp-fill" class="baron-hp-fill"></div>
+                </div>
+                <div id="hp-text" class="hp-text">12000</div>
+            </div>
+
+            <div id="result-text" class="result-text">STOLEN!</div>
+            
+            <div id="ui-layer">
+                <div class="stat-box">LEVEL: <span id="level-val" style="color: var(--t1-gold);">1</span>/5</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="victory-modal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2>CHAPTER 4 CLEARED</h2>
+                <div class="sub-title">THE GOD OF STEAL</div>
+            </div>
+            <div class="modal-body">
+                <div class="memory-image-placeholder">
+                    <span style="font-size: 3rem; color: #E4002B;">2022</span>
+                    <p>Worlds Finals - The Varus Steal</p>
+                </div>
+                <p class="story-text">
+                    "Gumayusi stole it again!"<br>
+                    他是世界上最冷靜的偷龍者。<br>
+                    即使在絕境中，他也能創造奇蹟，<br>
+                    為隊伍保留最後一線生機。
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button onclick="location.reload()" class="btn-small">↺ Replay</button>
+                <a href="index.html" class="btn-small filled">Back to Menu</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="game4.js"></script>
+</body>
+</html>
