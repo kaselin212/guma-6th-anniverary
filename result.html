@@ -260,8 +260,8 @@
             list.innerHTML = `<li class="score-item" style="justify-content: center; color: #888;">正在連接伺服器...</li>`;
             
             try {
-                // 查詢 scores 集合，按分數遞減排序，取前 10 名
-                const q = query(collection(db, "scores"), orderBy("score", "desc"), limit(10));
+                // 查詢 scores 集合，按分數遞減排序，取前 20 名
+                const q = query(collection(db, "scores"), orderBy("score", "desc"), limit(20));
                 const querySnapshot = await getDocs(q);
                 
                 list.innerHTML = ""; // 清空載入中提示
