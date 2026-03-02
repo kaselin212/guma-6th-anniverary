@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Score & Leaderboard</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            background: #111;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 40px 20px;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+        }
+        
+        .result-container {
+            background: rgba(20, 20, 20, 0.9);
+            border: 2px solid var(--t1-gold);
+            border-radius: 12px;
+            padding: 40px;
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(198, 156, 109, 0.2);
+            margin-bottom: 40px;
+        }
+
+        .total-score {
+            font-size: 5rem;
+            font-weight: 900;
+            color: var(--t1-red);
+            margin: 20px 0;
+            text-shadow: 0 0 20px rgba(228, 0, 43, 0.5);
+        }
+
+        .action-area {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid #333;
+        }
+
+        input[type="text"] {
+            padding: 12px;
+            font-size: 1.2rem;
+            border: 1px solid var(--t1-gold);
+            background: #222;
+            color: white;
+            border-radius: 4px;
+            margin-right: 10px;
+            width: 60%;
+            text-align: center;
+        }
+
+        /* 排行榜區塊 */
+        .leaderboard {
+            width: 100%;
+            max-width: 600px;
+            background: #1a1a1a;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .leaderboard h3 {
+            color: var(--t1-gold);
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .score-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .score-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 15px;
+            border-bottom: 1px solid #333;
+            font-size: 1.1rem;
+        }
+
+        .score-item:nth-child(1) { color: #f1c40f; font-weight: bold; font-size: 1.3rem;}
+        .score-item:nth-child(2) { color: #bdc3c7; font-weight: bold; font-size: 1.2rem;}
+        .score-item:nth-child(3) { color: #cd7f32; font-weight: bold; }
+
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="result-container">
+        <h2>ADC COMPREHENSIVE EVALUATION</h2>
+        <div style="color: #888; letter-spacing: 2px;">YOUR TOTAL SCORE</div>
+        
+        <div class="total-score" id="display-score">0</div>
+        
+        <div class="action-area" id="action-area">
+            <p>載入玩家資料中...</p>
+        </div>
+
+        <div class="btn-group">
+            <button onclick="replayGame()" class="btn-small">↺ 重新挑戰</button>
+            <a href="celebration.html" class="btn-small filled">進入榮譽殿堂 →</a>
+        </div>
+    </div>
+
+    <div class="leaderboard">
+        <h3>🏆 GLOBAL TOP 10</h3>
+        <ul class="score-list" id="leaderboard-list">
+            <li class="score-item" style="justify-content: center; color: #888;">正在連接伺服器...</li>
+        </ul>
+    </div>
+
+    <script type="module">
+        // 1. 引入 Firebase (日後您去 Firebase 申請專案後，將金鑰填入這裡)
+        /* import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, doc, setDoc, getDocs, query, collection, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        
+        const firebaseConfig = {
+            // ... 您的 Firebase 設定 ...
+        };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        */
+
+        // 2. 取得 DOM 元素
+        const scoreDisplay = document.getElementById('display-score');
+        const actionArea = document.getElementById('action-area');
+        
+        // 3. 讀取本次遊玩的分數 (假設 Game1~4 都有把分數存進 guma_current_score)
+        let currentScore = parseInt(sessionStorage.getItem('guma_current_score')) || 8500; // 測試用預設 8500
+        scoreDisplay.innerText = currentScore;
+
+        // 4. 判斷玩家身分與歷史紀錄
+        const playerUUID = localStorage.getItem('guma_uuid');
+        const playerName = localStorage.getItem('guma_name');
+        const highScore = parseInt(localStorage.getItem('guma_highscore')) || 0;
+
+        renderActionArea();
+
+        function renderActionArea() {
+            if (!playerUUID) {
+                // 狀態 A：完全的新玩家
+                actionArea.innerHTML = `
+                    <p style="margin-bottom: 15px; color: #ccc;">將你的成就銘刻在傳奇榜單上</p>
+                    <input type="text" id="input-name" placeholder="輸入您的暱稱 (最多10字)" maxlength="10">
+                    <button id="submit-btn" class="btn-small filled">上傳成績</button>
+                `;
+                document.getElementById('submit-btn').addEventListener('click', handleFirstTimeSubmit);
+            } 
+            else if (currentScore > highScore) {
+                // 狀態 B：老玩家，且破了自己紀錄
+                actionArea.innerHTML = `
+                    <p style="margin-bottom: 15px; color: #2ecc71;">🎉 新紀錄！幹得好，${playerName}！</p>
+                    <button id="submit-btn" class="btn-small filled">更新排行榜成績</button>
+                `;
+                document.getElementById('submit-btn').addEventListener('click', handleUpdateSubmit);
+            } 
+            else {
+                // 狀態 C：老玩家，但沒破紀錄
+                actionArea.innerHTML = `
+                    <p style="color: #888;">這次差一點點喔，${playerName}！</p>
+                    <p style="color: #666; font-size: 0.9rem;">您的最高分紀錄是: <span style="color: var(--t1-gold);">${highScore}</span></p>
+                `;
+            }
+        }
+
+        // --- 處理送出邏輯 ---
+
+        // 產生 UUID 的輔助函數
+        function generateUUID() {
+            return crypto.randomUUID ? crypto.randomUUID() : 'user-' + Math.random().toString(36).substr(2, 9);
+        }
+
+        async function handleFirstTimeSubmit() {
+            const nameInput = document.getElementById('input-name').value.trim();
+            if (!nameInput) return alert("請輸入暱稱！");
+
+            const btn = document.getElementById('submit-btn');
+            btn.disabled = true;
+            btn.innerText = "上傳中...";
+
+            // 1. 生成並儲存設備綁定資料
+            const newUUID = generateUUID();
+            localStorage.setItem('guma_uuid', newUUID);
+            localStorage.setItem('guma_name', nameInput);
+            localStorage.setItem('guma_highscore', currentScore);
+
+            // 2. 寫入 Firebase (註解掉的是實際程式碼，目前用 setTimeout 模擬)
+            /*
+            try {
+                // 使用 setDoc 與自訂的 UUID，確保未來更新是覆寫同一筆
+                await setDoc(doc(db, "scores", newUUID), {
+                    name: nameInput,
+                    score: currentScore,
+                    timestamp: new Date().toISOString()
+                });
+                alert("上傳成功！");
+                renderActionArea(); // 重新渲染 UI 變成狀態 C
+                loadLeaderboard(); // 刷新榜單
+            } catch (e) {
+                console.error(e);
+                alert("上傳失敗");
+            }
+            */
+            
+            // 模擬上傳成功
+            setTimeout(() => {
+                alert(`上傳成功！歡迎加入榜單，${nameInput}！`);
+                renderActionArea();
+            }, 800);
+        }
+
+        async function handleUpdateSubmit() {
+            const btn = document.getElementById('submit-btn');
+            btn.disabled = true;
+            btn.innerText = "更新中...";
+
+            // 更新本地最高分
+            localStorage.setItem('guma_highscore', currentScore);
+
+            // 寫入 Firebase 覆寫資料
+            /*
+            try {
+                await setDoc(doc(db, "scores", playerUUID), {
+                    name: playerName,
+                    score: currentScore,
+                    timestamp: new Date().toISOString()
+                }, { merge: true }); // merge: true 確保不小心覆蓋到其他欄位
+                
+                alert("紀錄更新成功！");
+                renderActionArea();
+                loadLeaderboard();
+            } catch(e) { ... }
+            */
+           
+            setTimeout(() => {
+                alert("紀錄更新成功！");
+                renderActionArea();
+            }, 800);
+        }
+
+        // --- 讀取排行榜邏輯 ---
+        function loadLeaderboard() {
+            // 這裡未來放 getDocs 的邏輯
+            // 目前放假資料展示 UI
+            const mockData = [
+                { name: "Gumayusi", score: 14500 },
+                { name: "Faker_Fan", score: 13200 },
+                { name: "Oner", score: 12100 },
+                { name: "T1_Win", score: 9800 },
+                { name: "ADC_King", score: 8500 }
+            ];
+
+            const list = document.getElementById('leaderboard-list');
+            list.innerHTML = "";
+            
+            mockData.forEach((data, index) => {
+                const li = document.createElement('li');
+                li.className = 'score-item';
+                li.innerHTML = `
+                    <span>#${index + 1}</span>
+                    <span style="flex-grow:1; text-align:center;">${data.name}</span>
+                    <span>${data.score}</span>
+                `;
+                list.appendChild(li);
+            });
+        }
+
+        // 頁面載入時讀取假資料榜單
+        loadLeaderboard();
+    </script>
+
+    <script>
+        // 重新挑戰邏輯：清空當局暫存，跳回第一關
+        function replayGame() {
+            sessionStorage.removeItem('guma_current_score');
+            window.location.href = 'game1.html';
+        }
+    </script>
+</body>
+</html>
