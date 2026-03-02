@@ -124,26 +124,33 @@
     </div>
 
     <script type="module">
-        // 1. 引入 Firebase (日後您去 Firebase 申請專案後，將金鑰填入這裡)
-        /* import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getFirestore, doc, setDoc, getDocs, query, collection, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        // 1. 引入 Firebase 核心與 Firestore 資料庫 (使用您的 12.10.0 版本)
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+        import { getFirestore, doc, setDoc, getDocs, query, collection, orderBy, limit } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
         
+        // 2. 您的專屬 Firebase 設定
         const firebaseConfig = {
-            // ... 您的 Firebase 設定 ...
+            apiKey: "AIzaSyChQdD8KpstHUXd2KVnS9OohurWte3sBOQ",
+            authDomain: "guma-6th-game.firebaseapp.com",
+            projectId: "guma-6th-game",
+            storageBucket: "guma-6th-game.firebasestorage.app",
+            messagingSenderId: "963526267859",
+            appId: "1:963526267859:web:d283700e33d19776341526"
         };
+
+        // 3. 初始化 Firebase 與資料庫連線
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        */
 
-        // 2. 取得 DOM 元素
+        // 取得 DOM 元素
         const scoreDisplay = document.getElementById('display-score');
         const actionArea = document.getElementById('action-area');
         
-        // 3. 讀取本次遊玩的分數 (假設 Game1~4 都有把分數存進 guma_current_score)
-        let currentScore = parseInt(sessionStorage.getItem('guma_current_score')) || 8500; // 測試用預設 8500
+        // 讀取本次遊玩的分數 (如果沒有就是 0)
+        let currentScore = parseInt(sessionStorage.getItem('guma_current_score')) || 0; 
         scoreDisplay.innerText = currentScore;
 
-        // 4. 判斷玩家身分與歷史紀錄
+        // 判斷玩家身分與歷史紀錄
         const playerUUID = localStorage.getItem('guma_uuid');
         const playerName = localStorage.getItem('guma_name');
         const highScore = parseInt(localStorage.getItem('guma_highscore')) || 0;
@@ -151,6 +158,12 @@
         renderActionArea();
 
         function renderActionArea() {
+            // 如果連 1 分都沒有，代表他根本沒玩直接跑來這頁
+            if (currentScore === 0) {
+                actionArea.innerHTML = `<p style="color: #888;">您還沒有遊戲紀錄喔！趕快去挑戰吧！</p>`;
+                return;
+            }
+
             if (!playerUUID) {
                 // 狀態 A：完全的新玩家
                 actionArea.innerHTML = `
@@ -161,7 +174,7 @@
                 document.getElementById('submit-btn').addEventListener('click', handleFirstTimeSubmit);
             } 
             else if (currentScore > highScore) {
-                // 狀態 B：老玩家，且破了自己紀錄
+                // 狀態 B：老玩家破紀錄
                 actionArea.innerHTML = `
                     <p style="margin-bottom: 15px; color: #2ecc71;">🎉 新紀錄！幹得好，${playerName}！</p>
                     <button id="submit-btn" class="btn-small filled">更新排行榜成績</button>
@@ -169,7 +182,7 @@
                 document.getElementById('submit-btn').addEventListener('click', handleUpdateSubmit);
             } 
             else {
-                // 狀態 C：老玩家，但沒破紀錄
+                // 狀態 C：老玩家沒破紀錄
                 actionArea.innerHTML = `
                     <p style="color: #888;">這次差一點點喔，${playerName}！</p>
                     <p style="color: #666; font-size: 0.9rem;">您的最高分紀錄是: <span style="color: var(--t1-gold);">${highScore}</span></p>
@@ -177,9 +190,8 @@
             }
         }
 
-        // --- 處理送出邏輯 ---
+        // --- 處理送出邏輯 (寫入資料庫) ---
 
-        // 產生 UUID 的輔助函數
         function generateUUID() {
             return crypto.randomUUID ? crypto.randomUUID() : 'user-' + Math.random().toString(36).substr(2, 9);
         }
@@ -192,35 +204,28 @@
             btn.disabled = true;
             btn.innerText = "上傳中...";
 
-            // 1. 生成並儲存設備綁定資料
             const newUUID = generateUUID();
             localStorage.setItem('guma_uuid', newUUID);
             localStorage.setItem('guma_name', nameInput);
             localStorage.setItem('guma_highscore', currentScore);
 
-            // 2. 寫入 Firebase (註解掉的是實際程式碼，目前用 setTimeout 模擬)
-            /*
             try {
-                // 使用 setDoc 與自訂的 UUID，確保未來更新是覆寫同一筆
+                // 真實寫入 Firebase Firestore
                 await setDoc(doc(db, "scores", newUUID), {
                     name: nameInput,
                     score: currentScore,
                     timestamp: new Date().toISOString()
                 });
-                alert("上傳成功！");
-                renderActionArea(); // 重新渲染 UI 變成狀態 C
+                
+                alert(`上傳成功！歡迎加入榜單，${nameInput}！`);
+                renderActionArea(); 
                 loadLeaderboard(); // 刷新榜單
             } catch (e) {
-                console.error(e);
-                alert("上傳失敗");
+                console.error("寫入錯誤:", e);
+                alert("上傳失敗，請檢查網路連線。");
+                btn.disabled = false;
+                btn.innerText = "重新上傳";
             }
-            */
-            
-            // 模擬上傳成功
-            setTimeout(() => {
-                alert(`上傳成功！歡迎加入榜單，${nameInput}！`);
-                renderActionArea();
-            }, 800);
         }
 
         async function handleUpdateSubmit() {
@@ -228,58 +233,72 @@
             btn.disabled = true;
             btn.innerText = "更新中...";
 
-            // 更新本地最高分
             localStorage.setItem('guma_highscore', currentScore);
 
-            // 寫入 Firebase 覆寫資料
-            /*
             try {
+                // 覆寫 Firebase 裡原本那筆資料
                 await setDoc(doc(db, "scores", playerUUID), {
                     name: playerName,
                     score: currentScore,
                     timestamp: new Date().toISOString()
-                }, { merge: true }); // merge: true 確保不小心覆蓋到其他欄位
+                }, { merge: true });
                 
                 alert("紀錄更新成功！");
                 renderActionArea();
                 loadLeaderboard();
-            } catch(e) { ... }
-            */
-           
-            setTimeout(() => {
-                alert("紀錄更新成功！");
-                renderActionArea();
-            }, 800);
+            } catch(e) { 
+                console.error("更新錯誤:", e);
+                alert("更新失敗，請稍後再試。");
+                btn.disabled = false;
+                btn.innerText = "重新更新";
+            }
         }
 
-        // --- 讀取排行榜邏輯 ---
-        function loadLeaderboard() {
-            // 這裡未來放 getDocs 的邏輯
-            // 目前放假資料展示 UI
-            const mockData = [
-                { name: "Gumayusi", score: 14500 },
-                { name: "Faker_Fan", score: 13200 },
-                { name: "Oner", score: 12100 },
-                { name: "T1_Win", score: 9800 },
-                { name: "ADC_King", score: 8500 }
-            ];
-
+        // --- 讀取排行榜邏輯 (從資料庫抓取前 10 名) ---
+        async function loadLeaderboard() {
             const list = document.getElementById('leaderboard-list');
-            list.innerHTML = "";
+            list.innerHTML = `<li class="score-item" style="justify-content: center; color: #888;">正在連接伺服器...</li>`;
             
-            mockData.forEach((data, index) => {
-                const li = document.createElement('li');
-                li.className = 'score-item';
-                li.innerHTML = `
-                    <span>#${index + 1}</span>
-                    <span style="flex-grow:1; text-align:center;">${data.name}</span>
-                    <span>${data.score}</span>
-                `;
-                list.appendChild(li);
-            });
+            try {
+                // 查詢 scores 集合，按分數遞減排序，取前 10 名
+                const q = query(collection(db, "scores"), orderBy("score", "desc"), limit(10));
+                const querySnapshot = await getDocs(q);
+                
+                list.innerHTML = ""; // 清空載入中提示
+                
+                if (querySnapshot.empty) {
+                    list.innerHTML = `<li class="score-item" style="justify-content: center; color: #888;">目前還沒有人挑戰喔！</li>`;
+                    return;
+                }
+
+                let rank = 1;
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const li = document.createElement('li');
+                    li.className = 'score-item';
+                    
+                    // 前三名給特別的顏色
+                    let rankColor = "#888";
+                    if (rank === 1) rankColor = "#f1c40f"; // 金
+                    if (rank === 2) rankColor = "#bdc3c7"; // 銀
+                    if (rank === 3) rankColor = "#cd7f32"; // 銅
+
+                    li.innerHTML = `
+                        <span style="color: ${rankColor}; font-weight: bold; width: 30px;">#${rank}</span>
+                        <span style="flex-grow:1; text-align:left; margin-left: 10px;">${data.name}</span>
+                        <span style="color: var(--t1-gold);">${data.score}</span>
+                    `;
+                    list.appendChild(li);
+                    rank++;
+                });
+
+            } catch (e) {
+                console.error("讀取排行榜錯誤:", e);
+                list.innerHTML = `<li class="score-item" style="justify-content: center; color: #E4002B;">無法載入排行榜，請稍後再試。</li>`;
+            }
         }
 
-        // 頁面載入時讀取假資料榜單
+        // 頁面載入時執行
         loadLeaderboard();
     </script>
 
