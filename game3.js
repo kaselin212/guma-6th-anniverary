@@ -13,9 +13,9 @@ let lastAttackTime = 0;
 const PLAYER_MOVE_SPEED = 5; // 玩家移動速度 (數值越大跑越快)
 
 // 數值
-let bossHp = 2000;
-const BOSS_MAX_HP = 2000;
-let playerHp = 100;
+let bossHp = 1000;
+const BOSS_MAX_HP = 1000;
+let playerHp = 200;
 
 // 座標系統 (初始在畫面下方)
 let playerX = 400;
@@ -144,9 +144,9 @@ function updateBoss() {
 
     bossSkillTimer++;
     // 難度控制：血越少招式越多
-    let cooldown = 60;
-    if (bossHp < 1000) cooldown = 45;
-    if (bossHp < 500) cooldown = 30;
+    let cooldown = 120;
+    if (bossHp < 500) cooldown = 100;
+    if (bossHp < 250) cooldown = 60;
 
     if (bossSkillTimer > cooldown) { 
         castSkill();
@@ -228,7 +228,7 @@ function gameLoop(timestamp) {
         if (Math.hypot(bossX - b.x, bossY - b.y) < 40) {
             b.el.remove();
             bullets.splice(i, 1);
-            bossHp -= 20;
+            bossHp -= 125;
             bossHpFill.style.width = (bossHp / BOSS_MAX_HP) * 100 + '%';
             boss.classList.add('hit');
             setTimeout(() => boss.classList.remove('hit'), 100);
