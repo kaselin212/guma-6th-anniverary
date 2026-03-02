@@ -5,6 +5,11 @@ const TARGET_SCORE = 10;
 const DAMAGE = 200; 
 let gameActive = true;
 
+// --- 新增計分變數 ---
+sessionStorage.removeItem('guma_current_score'); // 確保新的一局從 0 開始
+let startTime = Date.now();
+let misses = 0;
+
 // 小兵尺寸 (用來計算碰撞)
 const MINION_SIZE = 70; // 60px本體 + 10px的安全距離
 
@@ -119,6 +124,7 @@ function spawnMinion() {
             if (hp <= 0) {
                 isDead = true;
                 minion.remove();
+                misses++;
                 showFloatingText(pos.x, pos.y, "Miss...", "gray");
             } else {
                 takeDamageLoop();
@@ -168,6 +174,16 @@ function showFloatingText(x, y, text, color) {
 function checkWin() {
     if (score >= TARGET_SCORE) {
         gameActive = false;
+        
+        // --- 計算第一關分數 ---
+        let timeTaken = (Date.now() - startTime) / 1000;
+        let timeBonus = Math.max(0, 1500 - Math.floor(timeTaken * 30)); // 越快通關分數越高
+        let levelScore = 1000 + timeBonus - (misses * 50); // 漏刀扣分
+        levelScore = Math.max(0, Math.floor(levelScore));
+        
+        // 存入暫存
+        sessionStorage.setItem('guma_current_score', levelScore);
+
         const modal = document.getElementById('victory-modal');
         modal.style.display = 'flex';
         setTimeout(() => modal.classList.add('show'), 10);

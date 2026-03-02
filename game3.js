@@ -275,6 +275,15 @@ function gameLoop(timestamp) {
 
 function gameWin() {
     gameActive = false;
+    
+    // --- 計算第三關分數 ---
+    let hpBonus = Math.max(0, playerHp) * 15; // 滿血(100)可以拿到額外 1500 分
+    let levelScore = 1000 + hpBonus;
+    
+    // 讀取之前的分數，並疊加
+    let total = parseInt(sessionStorage.getItem('guma_current_score')) || 0;
+    sessionStorage.setItem('guma_current_score', total + levelScore);
+
     const modal = document.getElementById('victory-modal');
     modal.style.display = 'flex';
     setTimeout(() => modal.classList.add('show'), 10);

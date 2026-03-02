@@ -10,6 +10,8 @@ const MAX_LEVEL = 5;
 let gameActive = false; // 按下開始前是 false
 let isStealing = false; // 玩家是否正在發射技能
 
+let game4TotalScore = 0; // 紀錄這五小關累積的總分
+
 // 數值設定
 let maxHp = 12000;
 let currentHp = 12000;
@@ -183,28 +185,35 @@ function endGame(success, failReason = "STOLEN BY ENEMY") {
         resultText.innerText = "STOLEN!";
         resultText.className = "result-text success";
         
-        // 成功音效? (腦補)
+        // --- 計算第四關分數 (極限反應紅利) ---
+        // currentHp 是扣除玩家傷害後的血量，hpBeforeHit 是你出手瞬間的血量
+        let hpBeforeHit = currentHp + PLAYER_DAMAGE; 
+        // 出手血量越低（越接近敵方斬殺線），表示膽子越大、越極限
+        let precisionBonus = Math.max(0, 2000 - hpBeforeHit); 
+        game4TotalScore += (500 + precisionBonus); // 基礎500 + 極限紅利
         
         setTimeout(() => {
             if (currentLevel < MAX_LEVEL) {
                 currentLevel++;
                 resetLevel();
             } else {
-                // 全部通關
+                // --- 第四關的 5 小關全破，進行最終總結算 ---
+                let total = parseInt(sessionStorage.getItem('guma_current_score')) || 0;
+                sessionStorage.setItem('guma_current_score', total + Math.floor(game4TotalScore));
+
                 const modal = document.getElementById('victory-modal');
                 modal.style.display = 'flex';
                 setTimeout(() => modal.classList.add('show'), 10);
             }
-        }, 2000); // 2秒後下一關
+        }, 1500); 
         
     } else {
         resultText.innerText = failReason;
         resultText.className = "result-text fail";
         
-        // 失敗，重試當前關卡
         setTimeout(() => {
             alert("搶奪失敗... 再試一次！");
-            resetLevel();
+            resetLevel(); 
         }, 1000);
     }
 }

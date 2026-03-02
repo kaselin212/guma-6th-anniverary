@@ -222,6 +222,14 @@ function showHitText(x, y, text, color) {
 
 function gameWin() {
     gameActive = false;
+    
+    // --- 計算第二關分數 ---
+    let levelScore = 1000 + (ammo * 100); // 剩餘子彈越多，證明準度越高
+    
+    // 讀取第一關的分數，並疊加
+    let total = parseInt(sessionStorage.getItem('guma_current_score')) || 0;
+    sessionStorage.setItem('guma_current_score', total + levelScore);
+
     const modal = document.getElementById('victory-modal');
     modal.style.display = 'flex';
     setTimeout(() => modal.classList.add('show'), 10);
