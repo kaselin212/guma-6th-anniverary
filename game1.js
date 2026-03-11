@@ -3,62 +3,66 @@ const scoreEl = document.getElementById('score-val');
 let score = 0;
 const TARGET_SCORE = 10;
 const DAMAGE = 200; 
-let gameActive = true;
 
-// --- 新增計分變數 ---
-sessionStorage.removeItem('guma_current_score'); // 確保新的一局從 0 開始
-let startTime = Date.now();
+// --- 初始狀態設為 false，等玩家看完說明按開始才變 true ---
+let gameActive = false; 
+
+sessionStorage.removeItem('guma_current_score');
+let startTime; // 改到按下開始時才記錄
 let misses = 0;
 
-// 小兵尺寸 (用來計算碰撞)
-const MINION_SIZE = 70; // 60px本體 + 10px的安全距離
+const MINION_SIZE = 70; 
 
-// --- 核心改動 1: 防止重疊的座標計算函數 ---
+// 開始遊戲函數 (由 HTML 的「開始挑戰」按鈕觸發)
+function startGame() {
+    // 隱藏說明 Popup
+    const tutorialModal = document.getElementById('tutorial-modal');
+    tutorialModal.classList.remove('show');
+    
+    setTimeout(() => {
+        tutorialModal.style.display = 'none';
+        // 正式啟動遊戲
+        gameActive = true;
+        startTime = Date.now();
+        scheduleNextSpawn();
+    }, 400); // 等待淡出動畫結束
+}
+
 function getSafePosition() {
-    const maxAttempts = 50; // 最多嘗試50次，避免畫面滿了造成死無窮迴圈
+    const maxAttempts = 50; 
     let attempt = 0;
     
+    // 扣除掉小兵的寬高，避免生成在框外
+    const maxX = container.clientWidth - MINION_SIZE;
+    const maxY = container.clientHeight - MINION_SIZE;
+
     while (attempt < maxAttempts) {
-        // 1. 隨機生成座標
-        const x = Math.random() * (740); // 容器寬800 - 60
-        const y = Math.random() * (440); // 容器高500 - 60
+        const x = Math.random() * maxX; 
+        const y = Math.random() * maxY; 
         
-        // 2. 檢查是否跟現有的任何一隻小兵重疊
         let collision = false;
         const existingMinions = document.querySelectorAll('.minion');
         
         for (let m of existingMinions) {
-            const rect = m.getBoundingClientRect();
-            // 取得現有小兵的座標 (相對於遊戲容器)
-            // 注意：這裡簡單計算，用 style.left/top 比較快
             const mx = parseFloat(m.style.left);
             const my = parseFloat(m.style.top);
-            
-            // 計算兩點距離 (畢氏定理)
             const dist = Math.hypot(x - mx, y - my);
             
-            // 如果距離太近 (小於兩隻小兵的寬度)，就算重疊
             if (dist < MINION_SIZE) {
                 collision = true;
-                break; // 撞到了，不用檢查其他的，直接換下一個位置
+                break; 
             }
         }
         
-        // 3. 如果沒撞到，這就是好位置！
-        if (!collision) {
-            return { x, y };
-        }
-        
+        if (!collision) return { x, y };
         attempt++;
     }
-    
-    // 如果試了50次都找不到位置 (畫面太擠)，這次就不生成
     return null;
 }
 
 function scheduleNextSpawn() {
     if (!gameActive) return;
-    const randomDelay = Math.random() * 1000 + 500; 
+    const randomDelay = Math.random() * 1000 + 400; // 稍微加快一點生成速度
     setTimeout(() => {
         spawnMinion();
         scheduleNextSpawn(); 
@@ -68,23 +72,22 @@ function scheduleNextSpawn() {
 function spawnMinion() {
     if (!gameActive) return;
 
-    // --- 呼叫上面的新函數取得位置 ---
     const pos = getSafePosition();
-    
-    // 如果回傳 null (找不到位置)，這次就跳過
     if (!pos) return; 
 
     const minion = document.createElement('div');
     minion.classList.add('minion');
-    
-    // --- 核心改動 2: 插入 Font Awesome 圖示 ---
-    // 這裡我們直接插入 HTML 字串，包含 i 標籤
-    minion.innerHTML = '<i class="fa-solid fa-pizza-slice"></i>';
-    
+    minion.style.position = 'absolute'; // 確保絕對定位
+    minion.style.width = '60px';  // 設定小兵大小
+    minion.style.height = '60px';
+    minion.style.cursor = 'pointer';
     minion.style.left = pos.x + 'px';
     minion.style.top = pos.y + 'px';
-
-    // 建立血條 (注意：現在要 append 到 minion 裡面，不要蓋掉 icon)
+    
+    // --- 換成您專屬的可愛小兵圖片 ---
+    minion.innerHTML = '<img src="game1-enemy.png" style="width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 5px 5px rgba(0,0,0,0.3));">';
+    
+    // 建立血條
     const hpContainer = document.createElement('div');
     hpContainer.classList.add('hp-bar-container');
     
@@ -99,33 +102,34 @@ function spawnMinion() {
     minion.appendChild(hpContainer);
     container.appendChild(minion);
 
-    // --- 以下是原本的扣血邏輯 (保持不變) ---
     let hp = 1000;
     const maxHp = 1000;
     let isDead = false;
 
     function takeDamageLoop() {
         if (isDead || !gameActive) return;
-        const nextHitTime = Math.random() * 1100 + 400; 
+        const nextHitTime = Math.random() * 900 + 400; 
 
         setTimeout(() => {
             if (isDead || !gameActive) return;
-            const damageChunk = Math.random() * 70 + 50; 
+            const damageChunk = Math.random() * 80 + 50; 
             hp -= damageChunk;
             const pct = (hp / maxHp) * 100;
             hpFill.style.width = Math.max(0, pct) + '%';
             
-            // 受擊動畫
-            minion.classList.add('hit');
-            setTimeout(() => minion.classList.remove('hit'), 200);
+            // 受擊動畫 (輕微震動)
+            minion.style.transform = "translateX(-3px)";
+            setTimeout(() => minion.style.transform = "translateX(3px)", 50);
+            setTimeout(() => minion.style.transform = "translateX(0)", 100);
 
             if (hp <= DAMAGE) hpFill.classList.add('executable');
 
             if (hp <= 0) {
                 isDead = true;
-                minion.remove();
+                minion.style.opacity = '0';
+                setTimeout(() => minion.remove(), 200);
                 misses++;
-                showFloatingText(pos.x, pos.y, "Miss...", "gray");
+                showFloatingText(pos.x, pos.y, "Miss...", "#888");
             } else {
                 takeDamageLoop();
             }
@@ -134,6 +138,7 @@ function spawnMinion() {
 
     takeDamageLoop();
 
+    // 點擊事件
     minion.addEventListener('mousedown', () => {
         if (isDead) return;
 
@@ -141,13 +146,17 @@ function spawnMinion() {
             isDead = true;
             score++;
             scoreEl.innerText = score;
-            showFloatingText(pos.x, pos.y, "+21g", "gold");
-            minion.style.transition = "transform 0.1s";
-            minion.style.transform = "scale(0)";
-            setTimeout(() => minion.remove(), 100);
+            showFloatingText(pos.x, pos.y, "+21g", "#C69C6D"); // 金幣顏色
+            
+            // 尾刀成功動畫 (放大後消失)
+            minion.style.transition = "all 0.15s ease-out";
+            minion.style.transform = "scale(1.3)";
+            minion.style.opacity = "0";
+            setTimeout(() => minion.remove(), 150);
+            
             checkWin();
         } else {
-            showFloatingText(pos.x, pos.y, "Too Early!", "red");
+            showFloatingText(pos.x, pos.y, "Too Early!", "#E4002B"); // 警告色
         }
     });
 }
@@ -160,12 +169,15 @@ function showFloatingText(x, y, text, color) {
     el.style.top = y + 'px';
     el.style.color = color;
     el.style.fontWeight = 'bold';
+    el.style.fontFamily = 'Arial, sans-serif';
     el.style.pointerEvents = 'none';
     el.style.transition = 'all 0.8s ease-out';
     el.style.zIndex = 100;
+    el.style.textShadow = '0 2px 4px rgba(0,0,0,0.8)';
     container.appendChild(el);
+    
     requestAnimationFrame(() => {
-        el.style.top = (y - 50) + 'px';
+        el.style.top = (y - 40) + 'px';
         el.style.opacity = 0;
     });
     setTimeout(() => el.remove(), 800);
@@ -175,19 +187,15 @@ function checkWin() {
     if (score >= TARGET_SCORE) {
         gameActive = false;
         
-        // --- 計算第一關分數 ---
         let timeTaken = (Date.now() - startTime) / 1000;
-        let timeBonus = Math.max(0, 1500 - Math.floor(timeTaken * 30)); // 越快通關分數越高
-        let levelScore = 1000 + timeBonus - (misses * 50); // 漏刀扣分
+        let timeBonus = Math.max(0, 1500 - Math.floor(timeTaken * 30)); 
+        let levelScore = 1000 + timeBonus - (misses * 50); 
         levelScore = Math.max(0, Math.floor(levelScore));
         
-        // 存入暫存
         sessionStorage.setItem('guma_current_score', levelScore);
 
+        // 顯示過關玻璃卡片
         const modal = document.getElementById('victory-modal');
-        modal.style.display = 'flex';
-        setTimeout(() => modal.classList.add('show'), 10);
+        modal.classList.add('show');
     }
 }
-
-scheduleNextSpawn();

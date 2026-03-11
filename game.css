@@ -1,16 +1,109 @@
 /* =========================================
-   1. 全域共用樣式 (Modal, UI, Animations)
+   1. 共用佈局與 Header (Game 1 ~ 4)
    ========================================= */
+body {
+    background-color: var(--bg-dark); 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    min-height: 100vh;
+}
 
-/* 通用 UI 層 (分數、彈藥等) */
+/* 左上角 LOGO */
+.top-left-logo {
+    position: absolute;
+    top: 30px;
+    left: 40px;
+    width: 200px;
+    filter: drop-shadow(0 0 10px rgba(255, 178, 197, 0.2));
+    z-index: 50;
+}
+
+/* 主要遊戲區塊容器 */
+.game-wrapper {
+    width: 100%;
+    max-width: 900px;
+    margin-top: 50px;
+    z-index: 10;
+}
+
+/* 標題與資訊列 */
+.game-header {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-bottom: 15px;
+}
+
+.header-top {
+    display: flex;
+    justify-content: flex-start;
+}
+
+.header-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding: 0 10px;
+}
+
+.game-title {
+    display: flex;
+    align-items: baseline;
+    gap: 15px;
+}
+
+.game-title .chap {
+    font-family: var(--font-en);
+    color: #888;
+    font-size: 1rem;
+}
+
+.game-title .tw {
+    font-family: var(--font-tw);
+    color: #fff;
+    font-size: 1.1rem;
+}
+
+.game-title .en {
+    font-family: var(--font-en);
+    color: var(--color-pink);
+    font-size: 2rem;
+    letter-spacing: 1px;
+}
+
+.game-objective {
+    font-family: var(--font-tw);
+    color: #fff;
+    font-size: 1rem;
+    letter-spacing: 1px;
+}
+
+/* =========================================
+   2. 遊戲主容器與 UI (Base Container)
+   ========================================= */
+#game-container {
+    width: 100%;
+    height: 550px; /* 預設高度，會在 RWD 被調整 */
+    background-color: #4a4a4f; /* 設計稿的深灰色 */
+    border-radius: 20px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+/* 通用 UI 層 (給 Game 2, 3, 4 用) */
 #ui-layer {
     position: absolute;
     top: 20px;
     left: 20px;
-    z-index: 20; /* 統一提高層級 */
+    z-index: 20; 
     display: flex;
     gap: 20px;
-    pointer-events: none; /* 讓滑鼠穿透文字 */
+    pointer-events: none; 
 }
 
 .stat-box {
@@ -19,491 +112,309 @@
     color: white;
 }
 
-.cs-score {
-    font-size: 2rem;
-    font-weight: bold;
-    color: var(--t1-gold);
-}
-
-/* --- Modal (通關卡片) --- */
-.modal-overlay {
+/* =========================================
+   3. 玻璃質感 Popup (Glass Modal 共用)
+   ========================================= */
+.glass-modal {
     position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(0, 0, 0, 0.85);
-    display: none;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(8px);
+    display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000;
-    backdrop-filter: blur(5px);
-}
-
-.modal-card {
-    background: linear-gradient(145deg, #1a1a1a, #0d0d0d);
-    border: 2px solid var(--t1-gold);
-    width: 90%;
-    max-width: 400px;
-    padding: 30px;
-    border-radius: 16px;
-    text-align: center;
-    box-shadow: 0 0 30px rgba(198, 156, 109, 0.3);
-    transform: translateY(20px);
+    z-index: 100;
     opacity: 0;
-    transition: all 0.5s ease-out;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
 }
-
-.modal-overlay.show .modal-card {
-    transform: translateY(0);
+.glass-modal.show {
     opacity: 1;
+    pointer-events: auto;
 }
-
-.modal-header h2 {
-    color: var(--t1-gold);
-    margin: 0;
-    font-size: 1.8rem;
+.glass-card {
+    background: linear-gradient(135deg, rgba(40,40,45,0.9) 0%, rgba(20,20,25,0.95) 100%);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 40px;
+    width: 90%;
+    max-width: 500px;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+    transform: translateY(20px);
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.glass-modal.show .glass-card {
+    transform: translateY(0);
+}
+.glass-card h2 {
+    font-family: var(--font-en);
+    color: var(--color-pink);
+    font-size: 2.5rem;
+    margin-top: 0;
+    margin-bottom: 10px;
     letter-spacing: 2px;
 }
-
-.sub-title {
-    color: #666;
-    font-size: 0.8rem;
-    letter-spacing: 4px;
-    margin-top: 5px;
-    text-transform: uppercase;
+.glass-card p {
+    font-family: var(--font-tw);
+    color: #ddd;
+    line-height: 1.8;
+    font-size: 1.1rem;
+    margin-bottom: 30px;
+}
+.highlight-text {
+    color: var(--t1-gold);
+    font-weight: bold;
 }
 
-.memory-image-placeholder {
-    background: #222;
-    height: 150px;
-    margin: 20px 0;
-    border-radius: 8px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    border: 1px dashed #444;
-    color: #555;
-}
-
-.story-text {
-    color: #ccc;
-    font-size: 0.9rem;
-    line-height: 1.6;
-    margin-bottom: 25px;
-}
-
-/* 小按鈕樣式 */
-.btn-small {
-    padding: 10px 20px;
-    border: 1px solid var(--t1-red);
-    background: transparent;
-    color: var(--t1-red);
-    cursor: pointer;
-    border-radius: 4px;
-    font-size: 0.9rem;
-    margin: 0 5px;
-    transition: all 0.2s;
-    text-decoration: none;
-    display: inline-block;
-}
-
-.btn-small.filled {
-    background: var(--t1-red);
-    color: white;
-}
-
-.btn-small:hover {
-    transform: scale(1.05);
-}
-
-/* 受擊抖動動畫 */
+/* 受擊抖動動畫 (共用) */
 @keyframes shake {
-    0% { transform: translate(1px, 1px) rotate(0deg); }
-    10% { transform: translate(-1px, -2px) rotate(-1deg); }
-    20% { transform: translate(-3px, 0px) rotate(1deg); }
-    30% { transform: translate(3px, 2px) rotate(0deg); }
-    40% { transform: translate(1px, -1px) rotate(1deg); }
-    50% { transform: translate(-1px, 2px) rotate(-1deg); }
-    60% { transform: translate(-3px, 1px) rotate(0deg); }
-    70% { transform: translate(3px, 1px) rotate(-1deg); }
-    80% { transform: translate(-1px, -1px) rotate(1deg); }
-    90% { transform: translate(1px, 2px) rotate(0deg); }
-    100% { transform: translate(1px, -2px) rotate(-1deg); }
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    50% { transform: translateX(4px); }
+    75% { transform: translateX(-4px); }
 }
 
 /* =========================================
-   2. 遊戲容器設定 (Base Container)
+   4. RWD 手機版響應式設定 (Game 1~4 共用)
    ========================================= */
-
-#game-container {
-    position: relative;
-    width: 800px;
-    /* height 由個別模式決定 */
-    /* background 由個別模式決定 */
-    margin: 0 auto;
-    overflow: hidden;
-    border-radius: 10px;
-    border: 2px solid #333;
+@media (max-width: 768px) {
+    .top-left-logo {
+        top: 15px; left: 15px; width: 120px;
+    }
+    .game-wrapper {
+        margin-top: 70px; padding: 0 15px; box-sizing: border-box;
+    }
+    .header-bottom {
+        flex-direction: column; align-items: flex-start; gap: 8px; padding: 0 5px;
+    }
+    .game-title {
+        gap: 10px; flex-wrap: wrap; 
+    }
+    .game-title .en {
+        font-size: 1.5rem; 
+    }
+    .game-objective {
+        font-size: 0.9rem;
+    }
+    #game-container {
+        height: 60vh; 
+        min-height: 380px; 
+        border-radius: 12px;
+    }
+    .glass-card {
+        padding: 25px 20px; width: 85%; 
+    }
+    .glass-card h2 { font-size: 1.8rem; }
+    .glass-card p { font-size: 0.95rem; margin-bottom: 20px; line-height: 1.6; }
 }
 
-/* Game 1 專用設定 (尾刀) */
+/* =========================================
+   5. Game 1 專屬樣式 (Last Hit)
+   ========================================= */
 #game-container.mode-lasthit {
-    height: 500px;
-    background: #111;
-    cursor: default; /* 或 crosshair */
+    cursor: default;
 }
-
-/* Game 2 專用設定 (射擊) */
-#game-container.mode-sniper {
-    height: 600px;
-    background: #1a1a1a;
-    cursor: crosshair;
-}
-
-/* =========================================
-   3. Game 1 專屬樣式 (Last Hit)
-   ========================================= */
-
-/* 小兵容器 */
-.minion {
-    position: absolute;
-    width: 60px;
-    height: 60px;
-    cursor: crosshair;
-    display: flex; 
-    justify-content: center;
-    align-items: center;
-    color: #ff9f43; /* 披薩橘 */
-    font-size: 3rem;
-    filter: drop-shadow(0 0 5px rgba(0,0,0,0.5));
-    transition: transform 0.1s;
-}
-
-.minion:active {
-    transform: scale(0.9);
-}
-
-.minion.hit {
-    animation: shake 0.2s;
-    filter: brightness(1.2) sepia(1) hue-rotate(-50deg) saturate(3);
-}
-
-/* 血條系統 */
 .hp-bar-container {
     position: absolute;
-    top: -10px;
-    width: 60px;
-    height: 10px;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50px;
+    height: 8px;
     background: #333;
-    border: 1px solid #000;
+    border: 1px solid #111;
+    border-radius: 4px;
+    overflow: hidden;
 }
-
-.hp-grid-overlay {
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    z-index: 2;
-    background: repeating-linear-gradient(
-        to right,
-        transparent,
-        transparent 19%, 
-        rgba(0,0,0,0.5) 19.5%,
-        rgba(0,0,0,0.5) 20%
-    );
-    pointer-events: none;
-}
-
 .hp-bar-fill {
     height: 100%;
-    background: #2ecc71;
-    width: 100%;
-    /* 無 transition 以增加打擊感 */
+    background: #2ecc71; 
+    transition: width 0.2s, background-color 0.2s;
 }
-
 .hp-bar-fill.executable {
     background: #f1c40f; 
 }
+.hp-grid-overlay {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: repeating-linear-gradient(to right, transparent, transparent 18%, #111 18%, #111 20%);
+    z-index: 2;
+}
 
 /* =========================================
-   4. Game 2 專屬樣式 (Sniper)
+   6. Game 2 專屬樣式 (Sniper)
    ========================================= */
-
-/* 玩家 (絕對置中) */
+#game-container.mode-sniper {
+    background: #1a1a24; /* 配合新版深藍色調 */
+    cursor: crosshair;
+}
 #player {
     position: absolute;
-    left: 50%;
-    top: 50%;
+    left: 50%; top: 50%;
     transform: translate(-50%, -50%);
-    width: 50px;
-    height: 50px;
+    width: 50px; height: 50px;
     color: var(--t1-gold);
     font-size: 2.5rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    display: flex; justify-content: center; align-items: center;
     z-index: 10;
     filter: drop-shadow(0 0 10px rgba(198, 156, 109, 0.5));
 }
-
-/* 箭矢 */
 .arrow {
     position: absolute;
-    height: 4px;
-    width: 20px;
-    background: #E4002B;
+    height: 4px; width: 20px;
+    background: var(--color-pink);
     border-radius: 2px;
-    box-shadow: 0 0 10px #E4002B;
+    box-shadow: 0 0 10px var(--color-pink);
 }
-
-/* 敵人 */
 .enemy {
     position: absolute;
-    width: 40px;
-    height: 40px;
+    width: 40px; height: 40px;
     color: #ccc;
     font-size: 1.5rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    display: flex; justify-content: center; align-items: center;
     transition: transform 0.1s linear;
 }
-
 .enemy.hit {
-    color: #E4002B;
+    color: var(--color-pink);
     transform: scale(1.5) !important;
     opacity: 0;
     transition: all 0.2s;
 }
 
 /* =========================================
-   5. Game 3 專屬樣式 (Kiting / Spacing)
+   7. Game 3 專屬樣式 (Kiting)
    ========================================= */
-
 #game-container.mode-kiting {
-    height: 600px;
-    background: #151515;
-    cursor: none; /* 隱藏滑鼠，由角色代替 */
+    background: #121215;
+    cursor: none; 
 }
-
-/* 玩家攻擊範圍指示器 (圈圈) */
 .range-indicator {
     position: absolute;
     border: 2px dashed rgba(255, 255, 255, 0.2);
     border-radius: 50%;
     pointer-events: none;
     transform: translate(-50%, -50%);
-    /* 範圍半徑由 JS 設定，這裡先給預設 */
-    width: 300px;
-    height: 300px;
+    width: 300px; height: 300px;
 }
-
-/* 進入攻擊範圍時，圈圈變亮 */
 .range-indicator.active {
-    border-color: rgba(228, 0, 43, 0.6); /* T1 Red */
-    background: rgba(228, 0, 43, 0.1);
+    border-color: rgba(175, 214, 239, 0.6); /* 改用粉藍色 */
+    background: rgba(175, 214, 239, 0.1);
 }
-
-/* BOSS */
 .boss {
     position: absolute;
-    width: 80px;
-    height: 80px;
-    top: 50px;
-    left: 50%;
+    width: 80px; height: 80px;
+    top: 50px; left: 50%;
     transform: translateX(-50%);
-    color: #a020f0; /* 紫色代表虛空或邪惡 */
+    color: var(--t1-red); 
     font-size: 4rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    filter: drop-shadow(0 0 15px rgba(160, 32, 240, 0.6));
-    transition: left 0.5s ease-in-out; /* 移動平滑 */
+    display: flex; justify-content: center; align-items: center;
+    filter: drop-shadow(0 0 15px rgba(228, 0, 43, 0.6));
+    transition: left 0.5s ease-in-out; 
 }
-
-.boss.hit {
-    filter: brightness(2) hue-rotate(90deg); /* 被打時變色 */
-}
-
-/* BOSS 血條 */
 .boss-hp-bar {
     position: absolute;
-    top: -20px;
-    left: 50%;
+    top: -20px; left: 50%;
     transform: translateX(-50%);
-    width: 100px;
-    height: 10px;
+    width: 100px; height: 10px;
     background: #333;
     border: 1px solid #000;
 }
-
 .boss-hp-fill {
-    width: 100%;
-    height: 100%;
-    background: #a020f0;
+    width: 100%; height: 100%;
+    background: var(--t1-red);
     transition: width 0.2s;
 }
-
-/* 敵方技能 (Skillshot) */
 .skillshot {
     position: absolute;
-    background: rgba(160, 32, 240, 0.8);
-    box-shadow: 0 0 10px rgba(160, 32, 240, 0.8);
+    background: rgba(228, 0, 43, 0.8);
+    box-shadow: 0 0 10px rgba(228, 0, 43, 0.8);
     border-radius: 4px;
-    /* 大小由 JS 決定 */
 }
-
-/* 玩家子彈 (普攻) */
 .player-bullet {
     position: absolute;
-    width: 10px;
-    height: 10px;
-    background: var(--t1-gold);
+    width: 10px; height: 10px;
+    background: var(--color-blue);
     border-radius: 50%;
-    box-shadow: 0 0 5px var(--t1-gold);
+    box-shadow: 0 0 5px var(--color-blue);
 }
-
-/* 玩家受傷特效 */
 .player-hit {
     animation: shake 0.3s;
-    color: red !important;
+    color: var(--t1-red) !important;
 }
-
-/* --- Click Marker (點擊地板特效) --- */
 .click-marker {
     position: absolute;
-    width: 30px;
-    height: 30px;
-    border: 2px solid #00ff00; /* 鮮綠色 */
+    width: 30px; height: 30px;
+    border: 2px solid var(--color-blue); 
     border-radius: 50%;
     transform: translate(-50%, -50%);
-    pointer-events: none; /* 讓滑鼠穿透，不影響點擊 */
+    pointer-events: none; 
     animation: clickRipple 0.5s ease-out forwards;
-    box-shadow: 0 0 10px #00ff00;
+    box-shadow: 0 0 10px var(--color-blue);
     opacity: 0.8;
 }
-
 @keyframes clickRipple {
     0% { width: 10px; height: 10px; opacity: 1; border-width: 3px; }
     100% { width: 50px; height: 50px; opacity: 0; border-width: 0px; }
 }
 
-/* 讓玩家角色移動時有轉身動畫 */
-#player {
-    transition: transform 0.1s linear; /* 轉身平滑 */
-}
-
 /* =========================================
-   6. Game 4 專屬樣式 (The Steal)
+   8. Game 4 專屬樣式 (The Steal)
    ========================================= */
-
 #game-container.mode-steal {
-    height: 600px;
-    background: #0F0F15; /* 深淵背景 */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    overflow: hidden;
+    background: #0a0a0d; 
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
 }
-
-/* 巴龍/遠古巨龍 */
 .objective-boss {
     position: relative;
-    font-size: 8rem; /* 超大 */
-    color: #a32eff; /* 巴龍紫 */
+    font-size: 8rem; 
+    color: #a32eff; 
     filter: drop-shadow(0 0 20px rgba(163, 46, 255, 0.4));
     transition: transform 0.1s;
     z-index: 5;
 }
-
-/* 受擊震動 */
 .objective-boss.shake {
     animation: shake 0.2s infinite;
 }
-
-/* 巴龍血條 (位於頭頂) */
 .baron-hp-container {
     position: absolute;
-    top: -40px;
-    left: 50%;
+    top: -40px; left: 50%;
     transform: translateX(-50%);
-    width: 300px;
-    height: 20px;
-    background: #222;
-    border: 2px solid #000;
-    border-radius: 4px;
-    overflow: hidden;
+    width: 300px; height: 20px;
+    background: #222; border: 2px solid #000; border-radius: 4px; overflow: hidden;
 }
-
 .baron-hp-fill {
-    width: 100%;
-    height: 100%;
-    background: #a32eff;
-    transition: width 0.05s linear; /* 平滑但快速 */
+    width: 100%; height: 100%; background: #a32eff; transition: width 0.05s linear;
 }
-
-/* 血量數字 */
 .hp-text {
     position: absolute;
-    top: -70px;
-    left: 50%;
+    top: -70px; left: 50%;
     transform: translateX(-50%);
-    color: white;
-    font-size: 1.5rem;
-    font-weight: bold;
-    text-shadow: 2px 2px 0 #000;
-    font-family: 'Courier New', monospace; /* 數字感 */
+    color: white; font-size: 1.5rem; font-weight: bold;
+    text-shadow: 2px 2px 0 #000; font-family: 'Courier New', monospace; 
 }
-
-/* 你的技能 (穿刺之箭) */
 .steal-projectile {
     position: absolute;
-    bottom: -100px; /* 從畫面外射進來 */
-    left: 50%;
+    bottom: -100px; left: 50%;
     transform: translateX(-50%);
-    width: 20px;
-    height: 80px;
-    background: linear-gradient(to top, var(--t1-red), white);
-    box-shadow: 0 0 20px var(--t1-red);
-    border-radius: 10px;
-    z-index: 10;
+    width: 20px; height: 80px;
+    background: linear-gradient(to top, var(--color-blue), white);
+    box-shadow: 0 0 20px var(--color-blue);
+    border-radius: 10px; z-index: 10;
 }
-
-/* 搶奪結果文字 */
 .result-text {
     position: absolute;
-    top: 40%;
-    left: 50%;
+    top: 40%; left: 50%;
     transform: translate(-50%, -50%) scale(0);
-    font-size: 5rem;
-    font-weight: 900;
-    text-transform: uppercase;
-    z-index: 20;
-    pointer-events: none;
+    font-size: 5rem; font-weight: 900; text-transform: uppercase;
+    z-index: 20; pointer-events: none;
     transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
-
 .result-text.success {
-    color: var(--t1-gold);
-    text-shadow: 0 0 20px var(--t1-red);
+    color: var(--t1-gold); text-shadow: 0 0 20px var(--t1-gold);
     transform: translate(-50%, -50%) scale(1);
 }
-
 .result-text.fail {
-    color: #555;
-    text-shadow: 0 0 10px #000;
+    color: #555; text-shadow: 0 0 10px #000;
     transform: translate(-50%, -50%) scale(1);
-}
-
-/* 斬殺線提示 (隨著難度提升可以隱藏) */
-.smite-line {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    width: 2px;
-    background: red;
-    opacity: 0.5;
-    /* 這個需要 JS 動態計算位置，這裡先不顯示 */
-    display: none; 
 }

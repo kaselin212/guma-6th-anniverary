@@ -3,52 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chapter 1: The Debut</title>
+    <title>Chapter 1: The Basic</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Forum&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="game.css">
+    <link rel="stylesheet" href="game.css"> 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
 
-    </style>
 </head>
 <body>
 
-    <div style="width: 100%; max-width: 800px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-            <a href="index.html" class="btn" style="padding: 5px 15px; font-size: 1rem;">← Back</a>
-            <div style="color: #666;">目標：尾刀 10 隻小兵</div>
+    <img src="guma-logo.png" alt="Gumayusi" class="top-left-logo">
+
+    <div class="game-wrapper">
+        <div class="game-header">
+            <div class="header-top">
+                <a href="index.html" class="pill-btn secondary"><i class="fa-solid fa-arrow-left"></i> 返回主畫面</a>
+            </div>
+            <div class="header-bottom">
+                <div class="game-title">
+                    <span class="chap">Chapter. 1</span>
+                    <span class="tw">基礎吃兵</span>
+                    <span class="en">The Basic</span>
+                </div>
+                <div class="game-objective">
+                    任務 1：尾刀小兵 10 隻 ( <span id="score-val" style="color: var(--color-pink); font-weight: bold;">0</span> / 10 )
+                </div>
+            </div>
         </div>
 
         <div id="game-container" class="mode-lasthit">
-            <div id="ui-layer">
-                <div class="cs-score">CS: <span id="score-val">0</span></div>
-            </div>
             </div>
     </div>
 
-    <div id="victory-modal" class="modal-overlay">
-        <div class="modal-card">
-            <div class="modal-header">
-                <h2>CHAPTER 1 CLEARED</h2>
-                <div class="sub-title">THE MONSTER ROOKIE</div>
-            </div>
-            
-            <div class="modal-body">
-                <div class="memory-image-placeholder">
-                    <span style="font-size: 3rem;">2020</span>
-                    <p>9.08 Debut</p>
-                </div>
-                
-                <p class="story-text">
-                    "Gumayusi is distinct!"<br>
-                    2020年，一位自信滿滿的新人在區域資格賽橫空出世。<br>
-                    他的凱特琳與達瑞文，讓世界記住了這個名字。
-                </p>
-            </div>
+    <div id="tutorial-modal" class="glass-modal show">
+        <div class="glass-card" style="border-color: var(--color-blue); box-shadow: 0 0 30px rgba(175, 214, 239, 0.2);">
+            <h2 style="color: var(--color-blue);">HOW TO PLAY</h2>
+            <p>
+                歡迎來到第一章：<span class="highlight-text">基礎吃兵</span>。<br><br>
+                身為頂尖 ADC，尾刀是基本功。<br>
+                小兵的血量會隨機減少，當血條進入 <span style="color:#f1c40f; font-weight:bold;">黃色斬殺線</span> 時，<br>
+                <strong>點擊小兵</strong> 即可成功補刀！<br><br>
+                <span style="font-size: 0.9rem; color: #888;">注意：太早點擊會導致 Miss 漏車喔！</span>
+            </p>
+            <button onclick="startGame()" class="pill-btn primary">開始挑戰</button>
+        </div>
+    </div>
 
-            <div class="modal-footer">
-                <button onclick="location.reload()" class="btn-small">↺ Replay</button>
-                <a href="game2.html" class="btn-small filled">Next Chapter →</a>
+    <div id="victory-modal" class="glass-modal">
+        <div class="glass-card">
+            <h2>CLEARED</h2>
+            <div style="font-family: var(--font-en); color: #888; letter-spacing: 3px; margin-bottom: 20px;">THE MONSTER ROOKIE</div>
+            
+            <p style="text-align: left; background: rgba(0,0,0,0.3); padding: 20px; border-radius: 8px; font-size: 1rem;">
+                "Gumayusi is distinct!"<br><br>
+                2020年，一位自信滿滿的新人在區域資格賽橫空出世。<br>
+                他的凱特琳與達瑞文，讓世界記住了這個名字。
+            </p>
+
+            <div style="display: flex; justify-content: center; gap: 15px; margin-top: 20px;">
+                <button onclick="location.reload()" class="pill-btn secondary">↺ 再刷一次</button>
+                <a href="game2.html" class="pill-btn primary">下一章 →</a>
             </div>
         </div>
     </div>

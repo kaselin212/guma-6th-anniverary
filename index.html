@@ -4,32 +4,94 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gumayusi 6th Anniversary</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Forum&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body>
-    <div style="text-align: center;">
-        <h1>Gumayusi<br>6th Anniversary</h1>
-        <p style="color: #888; margin-bottom: 40px;">重溫傳奇 ADC 的成神之路</p>
+<body class="home-body">
+    
+    <div id="stars-container"></div>
 
-        <div class="menu-grid">
-            <a href="game1.html" class="btn">
-                CHAPTER 1<br>
-                <span style="font-size: 0.8rem;">The Debut (尾刀特訓)</span>
+    <div class="home-wrapper">
+        
+        <header class="home-header">
+            <img src="guma-logo.png" alt="Gumayusi" class="main-logo">
+        </header>
+
+        <a href="game1.html" class="pill-btn primary">
+            挑戰GOGO <i class="fa-solid fa-arrow-right" style="margin-left: 5px; font-size: 0.9em;"></i>
+        </a>
+
+        <div class="chapter-grid">
+            <a href="game1.html" class="chapter-card">
+                <span class="chapter-num">Chapter. 1</span>
+                <span class="chapter-title">The Basic</span>
+                <span class="chapter-desc">基礎吃兵</span>
             </a>
             
-            <a href="game2.html" class="btn">
-                CHAPTER 2<br>
-                <span style="font-size: 0.8rem;">Skillshot (精準預判)</span>
+            <a href="game2.html" class="chapter-card">
+                <span class="chapter-num">Chapter. 2</span>
+                <span class="chapter-title">The Prediction</span>
+                <span class="chapter-desc">精準預判</span>
             </a>
-            <a href="game3.html" class="btn">
-                CHAPTER 3<br>
-                <span style="font-size: 0.8rem;">Kiting (極限拉扯)</span>
+
+            <a href="game3.html" class="chapter-card">
+                <span class="chapter-num">Chapter. 3</span>
+                <span class="chapter-title">The Kiting</span>
+                <span class="chapter-desc">極限拉扯</span>
             </a>
-            <a href="game4.html" class="btn">
-                CHAPTER 4<br>
-                <span style="font-size: 0.8rem;">The Steal (神之竊取)</span>
+
+            <a href="game4.html" class="chapter-card">
+                <span class="chapter-num">Chapter. 4</span>
+                <span class="chapter-title">The Steal</span>
+                <span class="chapter-desc">神之一偷</span>
             </a>
         </div>
+
+        <div class="bottom-actions">
+            <a href="celebration.html" class="pill-btn secondary">榮耀殿堂</a>
+            <a href="result.html" class="pill-btn secondary">排行榜</a>
+        </div>
+
     </div>
+
+    <script>
+        function createStars() {
+            const container = document.getElementById('stars-container');
+            const starCount = 80; // 星星的總數量，可以依喜好增減
+            const colors = ['pink', 'blue', 'white']; // 對應 CSS 的 class
+
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                
+                // 隨機賦予粉紅、粉藍或白色
+                const colorClass = colors[Math.floor(Math.random() * colors.length)];
+                star.classList.add(colorClass);
+
+                // 在畫面上隨機散佈位置 (0% ~ 100%)
+                star.style.left = Math.random() * 100 + 'vw';
+                star.style.top = Math.random() * 100 + 'vh';
+
+                // 隨機大小 (1px ~ 3px，營造遠近感)
+                const size = Math.random() * 2 + 1;
+                star.style.width = size + 'px';
+                star.style.height = size + 'px';
+
+                // 隨機的閃爍速度 (2秒 ~ 5秒) 與 隨機的起始延遲
+                star.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                star.style.animationDelay = (Math.random() * 5) + 's';
+
+                container.appendChild(star);
+            }
+        }
+
+        // 網頁載入時執行生成星星
+        createStars();
+    </script>
 </body>
 </html>
