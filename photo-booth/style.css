@@ -1,0 +1,125 @@
+/* 定義 Design System 變數 */
+:root {
+  --primary-color: #ff6b6b;
+  --bg-color: #f8f9fa;
+  --text-color: #333;
+  --card-bg: #fff;
+  --border-radius: 16px;
+  --transition-speed: 0.3s;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+/* 視圖切換邏輯 */
+.view-section {
+  display: none; /* 預設隱藏 */
+  width: 100%;
+  max-width: 500px;
+  padding: 24px;
+  text-align: center;
+}
+.view-section.active {
+  display: block; /* 加上 active 才會顯示 */
+}
+
+/* 排版卡片 UI */
+.layout-options {
+  display: flex;
+  gap: 16px;
+  margin: 32px 0;
+}
+.layout-card {
+  flex: 1;
+  cursor: pointer;
+}
+.layout-card input[type="radio"] {
+  display: none; /* 隱藏原生 Radio，用 UI 取代 */
+}
+.card-ui {
+  background: var(--card-bg);
+  padding: 24px 16px;
+  border-radius: var(--border-radius);
+  border: 2px solid transparent;
+  transition: all var(--transition-speed);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+/* 選中狀態的 UI 回饋 */
+.layout-card input[type="radio"]:checked + .card-ui {
+  border-color: var(--primary-color);
+  box-shadow: 0 4px 16px rgba(255, 107, 107, 0.2);
+}
+
+/* 示意排版的灰色方塊 */
+.placeholder-box {
+  background: #e9ecef;
+  margin: 0 auto 16px;
+  border-radius: 4px;
+}
+.portrait-box { width: 60px; height: 80px; }
+.landscape-box { width: 80px; height: 60px; }
+
+/* 按鈕樣式 */
+button {
+  width: 100%;
+  padding: 16px;
+  border-radius: var(--border-radius);
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  transition: opacity var(--transition-speed);
+}
+.btn-primary { background: var(--primary-color); color: white; }
+.btn-secondary { background: #dee2e6; color: var(--text-color); margin-top: 12px;}
+button:active { opacity: 0.8; }
+
+/* 相機佔位區塊 */
+.camera-viewport {
+  background: #000;
+  color: white;
+  height: 60vh;
+  border-radius: var(--border-radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+/* =========================================
+   核心 UX：轉向遮罩邏輯
+   ========================================= */
+.overlay {
+  display: none; /* 預設完全不顯示 */
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px); /* 毛玻璃效果 */
+  z-index: 9999;
+  color: white;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.rotate-icon { font-size: 64px; margin-bottom: 16px; animation: spin 2s linear infinite; }
+@keyframes spin { 100% { transform: rotate(360deg); } }
+
+/* 🌟 魔法發生在這裡：
+   只有當 body 擁有 .require-landscape 且 設備處於直式 (portrait) 時，才顯示遮罩 */
+@media (orientation: portrait) {
+  body.require-landscape .overlay {
+    display: flex;
+  }
+}

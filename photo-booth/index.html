@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>線上拍貼機</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div id="orientation-mask" class="overlay">
+    <div class="overlay-content">
+      <div class="rotate-icon">🔄</div>
+      <h2>請轉動手機</h2>
+      <p>您選擇了橫式排版，請將裝置轉為橫向以進行拍攝</p>
+    </div>
+  </div>
+
+  <section id="phase1-layout" class="view-section active">
+    <header>
+      <h1>選擇拍貼排版</h1>
+      <p>請選擇您想要的洗照片格式</p>
+    </header>
+    
+    <div class="layout-options">
+      <label class="layout-card">
+        <input type="radio" name="layoutType" value="polaroid" checked>
+        <div class="card-ui">
+          <div class="placeholder-box portrait-box"></div>
+          <span>單張拍立得</span>
+        </div>
+      </label>
+
+      <label class="layout-card">
+        <input type="radio" name="layoutType" value="korean4x1">
+        <div class="card-ui">
+          <div class="placeholder-box landscape-box"></div>
+          <span>韓式 4x1</span>
+        </div>
+      </label>
+    </div>
+
+    <button id="btn-next" class="btn-primary">下一步</button>
+  </section>
+
+  <section id="phase2-camera" class="view-section">
+    <header>
+      <h1>準備拍攝</h1>
+    </header>
+    <div class="camera-viewport">
+      <p>📷 這裡之後會放 Video 標籤</p>
+    </div>
+    <button id="btn-back" class="btn-secondary">返回重選</button>
+  </section>
+
+  <script src="app.js"></script>
+</body>
+</html>
