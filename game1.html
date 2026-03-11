@@ -6,7 +6,7 @@
     <title>Chapter 1: The Basic</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Forum&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cherry+Bomb+One&family=Forum&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="game.css"> 
@@ -52,20 +52,35 @@
         </div>
     </div>
 
-    <div id="victory-modal" class="glass-modal">
-        <div class="glass-card">
-            <h2>CLEARED</h2>
-            <div style="font-family: var(--font-en); color: #888; letter-spacing: 3px; margin-bottom: 20px;">THE MONSTER ROOKIE</div>
-            
-            <p style="text-align: left; background: rgba(0,0,0,0.3); padding: 20px; border-radius: 8px; font-size: 1rem;">
-                "Gumayusi is distinct!"<br><br>
+    <div id="victory-modal" class="result-modal">
+        <div class="result-content">
+            <img src="guma-logo.png" alt="Gumayusi" class="result-logo">
+
+            <div class="result-header">
+                <div class="result-title-group">
+                    <h2 class="result-chapter">Chapter. 1</h2>
+                    <div class="cleared-stamp">Cleared</div>
+                </div>
+                <div class="result-date">2020 / 9 / 8 Debut</div>
+            </div>
+
+            <div class="video-container">
+                <iframe src="https://www.youtube.com/embed/yxzlr_fx36s" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+            </div>
+
+            <h3 class="result-nickname">The Monster Rookie</h3>
+            <p class="result-story">
                 2020年，一位自信滿滿的新人在區域資格賽橫空出世。<br>
                 他的凱特琳與達瑞文，讓世界記住了這個名字。
             </p>
 
-            <div style="display: flex; justify-content: center; gap: 15px; margin-top: 20px;">
-                <button onclick="location.reload()" class="pill-btn secondary">↺ 再刷一次</button>
-                <a href="game2.html" class="pill-btn primary">下一章 →</a>
+            <div class="result-score-box">
+                累計表現評分 : <span id="current-total-score" class="score-number">0</span>
+            </div>
+
+            <div class="result-actions">
+                <button onclick="location.reload()" class="pill-btn outline">↺ 重新遊玩</button>
+                <a href="game2.html" class="pill-btn outline">下一章 →</a>
             </div>
         </div>
     </div>

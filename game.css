@@ -418,3 +418,159 @@ body {
     color: #555; text-shadow: 0 0 10px #000;
     transform: translate(-50%, -50%) scale(1);
 }
+
+/* =========================================
+   9. 過關結算畫面 (Result Modal 共用)
+   ========================================= */
+.result-modal {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(18, 18, 22, 0.98); /* 極深色背景，幾乎不透明，符合設計稿 */
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* 讓內容可以往下滾動 */
+    z-index: 200;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+    overflow-y: auto; /* 允許滾動，避免手機螢幕太小被切斷 */
+}
+.result-modal.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+.result-content {
+    width: 90%;
+    max-width: 700px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 60px 0;
+    transform: translateY(30px);
+    transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+.result-modal.show .result-content {
+    transform: translateY(0);
+}
+.result-logo {
+    width: 250px;
+    margin-bottom: 30px;
+    filter: drop-shadow(0 0 10px rgba(255, 178, 197, 0.2));
+}
+
+/* 標題與印章區塊 */
+.result-header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+}
+.result-title-group {
+    position: relative;
+}
+.result-chapter {
+    font-family: var(--font-en);
+    font-size: 3.5rem;
+    color: #fff;
+    margin: 0;
+    line-height: 1;
+}
+.cleared-stamp {
+    position: absolute;
+    top: -10px;
+    right: -45px;
+    font-family: 'Arial', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 900;
+    color: #f39c12; /* 橘黃色印章 */
+    border: 2px solid #f39c12;
+    padding: 2px 8px;
+    border-radius: 4px;
+    transform: rotate(-15deg);
+    text-transform: uppercase;
+}
+.result-date {
+    font-family: var(--font-tw);
+    color: #888;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+}
+
+/* 影片區塊 */
+.video-container {
+    width: 100%;
+    aspect-ratio: 16 / 9; /* 強制維持 16:9 比例 */
+    background: #000;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+}
+.video-container iframe {
+    width: 100%;
+    height: 100%;
+}
+
+/* 稱號與文字 */
+.result-nickname {
+    font-family: 'Cherry Bomb One', cursive; /* 引入新字體 */
+    font-size: 2.2rem;
+    background: linear-gradient(to right, var(--color-blue), var(--color-pink));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin: 0 0 15px 0;
+    letter-spacing: 2px;
+}
+.result-story {
+    font-family: var(--font-tw);
+    color: #ccc;
+    text-align: center;
+    line-height: 1.8;
+    margin-bottom: 25px;
+    font-size: 0.95rem;
+}
+
+/* 累積分數區塊 */
+.result-score-box {
+    font-family: var(--font-tw);
+    font-size: 1.1rem;
+    color: #aaa;
+    margin-bottom: 30px;
+    letter-spacing: 2px;
+}
+.score-number {
+    font-family: var(--font-en);
+    font-size: 2rem;
+    color: var(--t1-gold);
+    font-weight: bold;
+    margin-left: 10px;
+}
+
+/* 底部按鈕 */
+.result-actions {
+    display: flex;
+    gap: 20px;
+}
+.pill-btn.outline {
+    border: 1px solid #fff;
+    background: transparent;
+    color: #fff;
+    padding: 10px 40px;
+}
+.pill-btn.outline:hover {
+    background: #fff;
+    color: #121215;
+}
+
+/* 手機版適配 */
+@media (max-width: 768px) {
+    .result-content { padding: 40px 0; }
+    .result-header { flex-direction: column; align-items: flex-start; gap: 10px; border-bottom: none; }
+    .result-chapter { font-size: 2.8rem; }
+    .cleared-stamp { right: -25px; top: -5px; }
+    .result-nickname { font-size: 1.8rem; }
+    .result-actions { flex-direction: column; width: 100%; }
+    .pill-btn.outline { width: 100%; text-align: center; box-sizing: border-box; }
+}

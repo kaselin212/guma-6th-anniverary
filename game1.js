@@ -192,9 +192,13 @@ function checkWin() {
         let levelScore = 1000 + timeBonus - (misses * 50); 
         levelScore = Math.max(0, Math.floor(levelScore));
         
+        // 將第一關的分數存入瀏覽器暫存
         sessionStorage.setItem('guma_current_score', levelScore);
 
-        // 顯示過關玻璃卡片
+        // --- 核心改動：將算好的分數顯示在 HTML 上 ---
+        document.getElementById('current-total-score').innerText = levelScore;
+
+        // 顯示新版的過關卡片
         const modal = document.getElementById('victory-modal');
         modal.classList.add('show');
     }
