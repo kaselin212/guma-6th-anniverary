@@ -124,17 +124,18 @@ document.addEventListener('DOMContentLoaded', () => {
           selectable: false, 
           evented: false,
           
-          // ✨ 魔法在這裡：利用 clipPath 把超出的部分裁切掉
+          // ✨ 魔法修正：加入 absolutePositioned，讓遮罩不受照片本身縮放影響
           clipPath: new fabric.Rect({
-            left: -slot.width / 2,
-            top: -slot.height / 2,
-            width: slot.width,
+            left: slot.x + slot.width / 2,   // 遮罩中心點對齊洞口中心點
+            top: slot.y + slot.height / 2,
+            width: slot.width,               // 遮罩大小完美等於洞口大小
             height: slot.height,
-            originX: 'left',
-            originY: 'top'
+            originX: 'center',
+            originY: 'center',
+            absolutePositioned: true         // 絕對座標模式
           })
         });
-
+        
         State.fCanvas.add(fImg);
         State.fCanvas.sendBackwards(fImg); // 丟到底層
       });
@@ -237,6 +238,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // [第二階段] 進入編輯
   UI.btnGoEdit.addEventListener('click', () => {
     stopCamera();
+
+    // ✨ UX 優化：進入編輯模式時，解除強制橫向的鎖定，讓使用者轉回直式舒適操作
+    document.body.classList.remove('require-landscape');
+
     UI.phase2.classList.remove('active');
     UI.phase3.classList.add('active');
     initEditor();
