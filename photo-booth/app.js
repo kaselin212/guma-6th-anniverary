@@ -1,121 +1,201 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const phase1 = document.getElementById('phase1-layout');
-  const phase2 = document.getElementById('phase2-camera');
-  const btnNext = document.getElementById('btn-next');
-  const btnBack = document.getElementById('btn-back');
-
-  // 進入下一步：相機模式
-  btnNext.addEventListener('click', () => {
-    // 取得當前選中的排版類型
-    const selectedLayout = document.querySelector('input[name="layoutType"]:checked').value;
-    
-    // 如果選擇了橫式的韓式排版，替 body 加上 require-landscape class
-    if (selectedLayout === 'korean4x1') {
-      document.body.classList.add('require-landscape');
-    }
-
-    // 切換 UI 視圖
-    phase1.classList.remove('active');
-    phase2.classList.add('active');
-  });
-
-  // 返回重選
-  btnBack.addEventListener('click', () => {
-    // 移除轉向限制
-    document.body.classList.remove('require-landscape');
-    
-    // 切換 UI 視圖
-    phase2.classList.remove('active');
-    phase1.classList.add('active');
-  });
-});
-
-
-// 新增全域變數來管理相機狀態
-let currentStream = null;
-let isFrontCamera = true; // 預設使用前鏡頭
-const capturedPhotos = []; // 用來存放拍下來的照片
-
-// 取得 HTML 元素
-const videoElement = document.getElementById('camera-stream');
-const canvasElement = document.getElementById('capture-canvas');
-const ctx = canvasElement.getContext('2d');
-const btnSwitchCam = document.getElementById('btn-switch-cam');
-const btnCapture = document.getElementById('btn-capture');
-const photoGallery = document.getElementById('photo-gallery');
-
-// --- 核心功能 1：啟動相機 ---
-async function startCamera() {
-  // 如果目前已經有開啟的鏡頭，先把它關掉 (這對切換鏡頭很重要)
-  if (currentStream) {
-    currentStream.getTracks().forEach(track => track.stop());
-  }
-
-  // 設定相機條件 (facingMode: user 是前鏡頭，environment 是後鏡頭)
-  const constraints = {
-    video: {
-      facingMode: isFrontCamera ? "user" : "environment",
-      // 建議設定較高的解析度，避免拍出來糊糊的
-      width: { ideal: 1920 },
-      height: { ideal: 1080 } 
-    },
-    audio: false // 拍貼機不需要麥克風權限
+  // ==========================================
+  // 1. 狀態管理 (State)
+  // ==========================================
+  const State = {
+    layoutType: 'polaroid', // 預設排版
+    currentStream: null,
+    isFrontCamera: true,
+    capturedPhotos: [],
+    fCanvas: null,
+    currentFrameLayer: null
   };
 
-  try {
-    // 呼叫瀏覽器 API 請求鏡頭權限
-    currentStream = await navigator.mediaDevices.getUserMedia(constraints);
-    videoElement.srcObject = currentStream;
-  } catch (err) {
-    console.error("無法開啟相機:", err);
-    alert("請允許相機權限，或確認設備是否有相機！");
-  }
-}
+  // ==========================================
+  // 2. DOM 元素集中管理 (UI Elements)
+  // ==========================================
+  const UI = {
+    // 區塊
+    phase1: document.getElementById('phase1-layout'),
+    phase2: document.getElementById('phase2-camera'),
+    phase3: document.getElementById('phase3-editor'),
+    // 按鈕
+    btnNext: document.getElementById('btn-next'),
+    btnBack: document.getElementById('btn-back'),
+    btnSwitchCam: document.getElementById('btn-switch-cam'),
+    btnCapture: document.getElementById('btn-capture'),
+    btnGoEdit: document.getElementById('btn-go-edit'),
+    // 相機與畫布元件
+    video: document.getElementById('camera-stream'),
+    hiddenCanvas: document.getElementById('capture-canvas'),
+    ctx: document.getElementById('capture-canvas').getContext('2d'),
+    photoGallery: document.getElementById('photo-gallery')
+  };
 
-// --- 核心功能 2：切換前後鏡頭 ---
-btnSwitchCam.addEventListener('click', () => {
-  isFrontCamera = !isFrontCamera; // 反轉布林值
-  startCamera(); // 重新啟動相機
-});
-
-// --- 核心功能 3：拍照與擷取畫面 ---
-btnCapture.addEventListener('click', () => {
-  // 1. 將 Canvas 的長寬設定為跟 Video 來源一樣大
-  canvasElement.width = videoElement.videoWidth;
-  canvasElement.height = videoElement.videoHeight;
-
-  // 2. 將 Video 當下的那一幀畫面，畫到 Canvas 上
-  // 如果是前鏡頭，通常需要水平翻轉 (鏡面效果)，這裡先做最單純的直接擷取
-  ctx.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
-
-  // 3. 把 Canvas 轉成 Base64 圖片字串 (格式為 PNG)
-  const photoDataUrl = canvasElement.toDataURL('image/png');
+  // ==========================================
+  // 3. 核心功能函式 (Functions)
+  // ==========================================
   
-  // 4. 存入陣列中 (後續 Phase 4 組合相框會用到)
-  capturedPhotos.push(photoDataUrl);
-
-  // 5. [測試用] 將拍下的照片立刻顯示在下方確認
-  const img = document.createElement('img');
-  img.src = photoDataUrl;
-  img.style.height = '100px';
-  img.style.borderRadius = '8px';
-  photoGallery.appendChild(img);
-});
-
-/* 記得修改原本的 btnNext 邏輯！
-  當使用者從 Phase 1 點擊「下一步」進入 Phase 2 時，才觸發啟動相機。
-*/
-document.getElementById('btn-next').addEventListener('click', () => {
-  // ... (保留原本判斷 require-landscape 的邏輯) ...
-  startCamera(); // 進入這頁時啟動相機
-});
-
-// 當使用者點擊「返回重選」時，記得關閉相機節省資源
-document.getElementById('btn-back').addEventListener('click', () => {
-  if (currentStream) {
-    currentStream.getTracks().forEach(track => track.stop());
+  // 啟動相機
+  async function startCamera() {
+    if (State.currentStream) {
+      State.currentStream.getTracks().forEach(track => track.stop());
+    }
+    const constraints = {
+      video: {
+        facingMode: State.isFrontCamera ? "user" : "environment",
+        width: { ideal: 1920 },
+        height: { ideal: 1080 } 
+      },
+      audio: false
+    };
+    try {
+      State.currentStream = await navigator.mediaDevices.getUserMedia(constraints);
+      UI.video.srcObject = State.currentStream;
+    } catch (err) {
+      console.error("無法開啟相機:", err);
+      alert("請允許相機權限，或確認設備是否有相機！");
+    }
   }
-  // 清空測試圖庫
-  photoGallery.innerHTML = '';
-  capturedPhotos.length = 0;
+
+  // 停止相機
+  function stopCamera() {
+    if (State.currentStream) {
+      State.currentStream.getTracks().forEach(track => track.stop());
+      State.currentStream = null;
+    }
+  }
+
+  // 初始化編輯畫布
+  function initEditor() {
+    if (!State.fCanvas) {
+      // TODO: 之後可以根據 State.layoutType 動態改變畫布的長寬比
+       State.fCanvas = new fabric.Canvas('editor-canvas', {
+         width: 320,
+         height: 420
+       });
+    }
+    State.fCanvas.clear();
+
+    if (State.capturedPhotos.length > 0) {
+      const imgElem = new Image();
+      imgElem.src = State.capturedPhotos[0]; 
+      imgElem.onload = () => {
+        const fImg = new fabric.Image(imgElem, { selectable: false, evented: false });
+        fImg.scaleToWidth(State.fCanvas.width);
+        State.fCanvas.add(fImg);
+        State.fCanvas.sendBackwards(fImg); 
+      };
+    }
+    loadFrame('img/polaroid/frame1.png');
+  }
+
+  // 載入相框圖層
+  async function loadFrame(imageUrl) {
+    try {
+      if (State.currentFrameLayer) {
+        State.fCanvas.remove(State.currentFrameLayer);
+      }
+      const frameImg = await fabric.Image.fromURL(imageUrl);
+      frameImg.scaleToWidth(State.fCanvas.width);
+      frameImg.set({ selectable: false, evented: false, left: 0, top: 0 });
+      
+      State.fCanvas.add(frameImg);
+      State.currentFrameLayer = frameImg;
+      
+      State.fCanvas.sendBackwards(frameImg); 
+      const photoLayer = State.fCanvas.getObjects().find(obj => obj !== frameImg && obj.type === 'image');
+      if (photoLayer) State.fCanvas.sendBackwards(photoLayer);
+      
+      State.fCanvas.renderAll();
+    } catch (error) {
+      console.error("相框載入失敗:", error);
+    }
+  }
+
+  // ==========================================
+  // 4. 事件監聽綁定 (Event Listeners)
+  // ==========================================
+
+  // [第一階段] 點擊下一步：切換視圖並開啟相機
+  UI.btnNext.addEventListener('click', () => {
+    State.layoutType = document.querySelector('input[name="layoutType"]:checked').value;
+    if (State.layoutType === 'korean4x1') {
+      document.body.classList.add('require-landscape');
+    }
+    UI.phase1.classList.remove('active');
+    UI.phase2.classList.add('active');
+    startCamera();
+  });
+
+  // [第二階段] 返回重選
+  UI.btnBack.addEventListener('click', () => {
+    document.body.classList.remove('require-landscape');
+    stopCamera();
+    UI.photoGallery.innerHTML = '';
+    State.capturedPhotos.length = 0;
+    UI.btnGoEdit.style.display = 'none';
+    UI.phase2.classList.remove('active');
+    UI.phase1.classList.add('active');
+  });
+
+  // [第二階段] 切換前後鏡頭
+  UI.btnSwitchCam.addEventListener('click', () => {
+    State.isFrontCamera = !State.isFrontCamera;
+    startCamera();
+  });
+
+  // [第二階段] 拍照
+  UI.btnCapture.addEventListener('click', () => {
+    UI.hiddenCanvas.width = UI.video.videoWidth;
+    UI.hiddenCanvas.height = UI.video.videoHeight;
+    UI.ctx.drawImage(UI.video, 0, 0, UI.hiddenCanvas.width, UI.hiddenCanvas.height);
+    
+    const photoDataUrl = UI.hiddenCanvas.toDataURL('image/png');
+    State.capturedPhotos.push(photoDataUrl);
+    
+    // 顯示預覽圖與進入編輯按鈕
+    const img = document.createElement('img');
+    img.src = photoDataUrl;
+    img.style.height = '100px';
+    img.style.borderRadius = '8px';
+    UI.photoGallery.appendChild(img);
+    UI.btnGoEdit.style.display = 'block'; 
+  });
+
+  // [第二階段] 進入編輯
+  UI.btnGoEdit.addEventListener('click', () => {
+    stopCamera();
+    UI.phase2.classList.remove('active');
+    UI.phase3.classList.add('active');
+    initEditor();
+  });
+
+  // [第三階段] 切換相框
+  document.querySelectorAll('.btn-frame').forEach(frameBtn => {
+    frameBtn.addEventListener('click', (e) => {
+      const selectedFrameUrl = e.target.getAttribute('src');
+      loadFrame(selectedFrameUrl);
+      document.querySelectorAll('.btn-frame').forEach(btn => btn.style.borderColor = 'transparent');
+      e.target.style.borderColor = 'var(--primary-color)';
+    });
+  });
+
+  // [第三階段] 新增貼紙
+  document.querySelectorAll('.btn-sticker').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const emoji = e.target.innerText;
+      const sticker = new fabric.Text(emoji, {
+        left: State.fCanvas.width / 2 - 20,
+        top: State.fCanvas.height / 2 - 20,
+        fontSize: 40,
+        transparentCorners: false,
+        cornerColor: '#ff6b6b',
+        cornerStyle: 'circle'
+      });
+      State.fCanvas.add(sticker);
+      State.fCanvas.setActiveObject(sticker); 
+    });
+  });
+
 });

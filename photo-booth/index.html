@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>線上拍貼機</title>
   <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/fabric@6/dist/index.js"></script>
 </head>
 <body>
 
@@ -60,6 +61,32 @@
     <canvas id="capture-canvas" style="display: none;"></canvas>
     
     <div id="photo-gallery" style="display: flex; gap: 8px; margin-top: 16px; overflow-x: auto;"></div>
+    <button id="btn-go-edit" class="btn-primary" style="display: none; margin-top: 12px;">🎨 進入編輯</button>
+  </section>
+
+  <section id="phase3-editor" class="view-section">
+    <header>
+      <h1>編輯專屬拍貼</h1>
+    </header>
+    
+    <div class="canvas-container" style="display: flex; justify-content: center; box-shadow: 0 10px 20px rgba(0,0,0,0.1); margin-bottom: 24px;">
+      <canvas id="editor-canvas"></canvas>
+    </div>
+
+    <div class="frame-bar" style="display: flex; gap: 12px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 8px;">
+      <p style="font-size: 14px; font-weight: bold; line-height: 40px; margin-right: 8px;">相框</p>
+      <img src="img/polaroid/frame1.png" class="btn-frame" style="height: 60px; cursor: pointer; border: 2px solid transparent; border-radius: 4px;">
+      <img src="img/polaroid/frame2.png" class="btn-frame" style="height: 60px; cursor: pointer; border: 2px solid transparent; border-radius: 4px;">
+    </div>
+
+    <div class="sticker-bar" style="display: flex; gap: 12px; margin-bottom: 24px; overflow-x: auto; padding-bottom: 8px;">
+      <button class="btn-sticker btn-secondary" style="width:auto; padding:8px 16px; border-radius:30px; font-size: 24px;">🌟</button>
+      <button class="btn-sticker btn-secondary" style="width:auto; padding:8px 16px; border-radius:30px; font-size: 24px;">💖</button>
+      <button class="btn-sticker btn-secondary" style="width:auto; padding:8px 16px; border-radius:30px; font-size: 24px;">🔥</button>
+      <button class="btn-sticker btn-secondary" style="width:auto; padding:8px 16px; border-radius:30px; font-size: 24px;">😎</button>
+    </div>
+
+    <button id="btn-download" class="btn-primary">💾 儲存並下載</button>
   </section>
 
   <script src="app.js"></script>
