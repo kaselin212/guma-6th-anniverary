@@ -12,6 +12,33 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   // ==========================================
+  // 1.5 排版設定檔 (Layout Configuration)
+  // ==========================================
+  const LayoutConfig = {
+    polaroid: {
+      canvasWidth: 360,   // 對應真實 1080px
+      canvasHeight: 500,  // 對應真實 1500px
+      maxPhotos: 1,       // 只需要拍 1 張
+      // 定義照片要放進去的「挖洞」座標與大小 (對應 900x1200)
+      slots: [
+        { x: 40, y: 40, width: 280, height: 373.3 } 
+      ]
+    },
+    korean4x1: {
+      canvasWidth: 200,   // 對應真實 600px
+      canvasHeight: 600,  // 對應真實 1800px
+      maxPhotos: 4,       // 需要拍 4 張！
+      // 定義 4 個挖洞的座標與大小 (對應 520x390)
+      slots: [
+        { x: 20, y: 20, width: 160, height: 120 },
+        { x: 20, y: 146.7, width: 160, height: 120 },
+        { x: 20, y: 273.3, width: 160, height: 120 },
+        { x: 20, y: 400, width: 160, height: 120 }
+      ]
+    }
+  };
+
+  // ==========================================
   // 2. DOM 元素集中管理 (UI Elements)
   // ==========================================
   const UI = {
@@ -68,26 +95,56 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 初始化編輯畫布
   function initEditor() {
+    const config = LayoutConfig[State.layoutType];
+
     if (!State.fCanvas) {
-      // TODO: 之後可以根據 State.layoutType 動態改變畫布的長寬比
-       State.fCanvas = new fabric.Canvas('editor-canvas', {
-         width: 320,
-         height: 420
-       });
+       State.fCanvas = new fabric.Canvas('editor-canvas');
     }
+    // 1. 動態設定畫布大小
+    State.fCanvas.setWidth(config.canvasWidth);
+    State.fCanvas.setHeight(config.canvasHeight);
     State.fCanvas.clear();
 
-    if (State.capturedPhotos.length > 0) {
-      const imgElem = new Image();
-      imgElem.src = State.capturedPhotos[0]; 
-      imgElem.onload = () => {
-        const fImg = new fabric.Image(imgElem, { selectable: false, evented: false });
-        fImg.scaleToWidth(State.fCanvas.width);
+    // 2. 讀取拍下來的照片，並裁切放入對應的洞口
+    State.capturedPhotos.forEach((photoUrl, index) => {
+      const slot = config.slots[index]; // 取得對應洞口的座標大小
+      
+      fabric.Image.fromURL(photoUrl).then(fImg => {
+        // 算出照片要放大縮小多少，才能剛好「填滿 (Cover)」這個洞口
+        const scale = Math.max(slot.width / fImg.width, slot.height / fImg.height);
+        
+        fImg.set({
+          // 將照片中心點對齊洞口的中心點
+          left: slot.x + slot.width / 2,
+          top: slot.y + slot.height / 2,
+          originX: 'center', 
+          originY: 'center',
+          scaleX: scale, 
+          scaleY: scale,
+          selectable: false, 
+          evented: false,
+          
+          // ✨ 魔法在這裡：利用 clipPath 把超出的部分裁切掉
+          clipPath: new fabric.Rect({
+            left: -slot.width / 2,
+            top: -slot.height / 2,
+            width: slot.width,
+            height: slot.height,
+            originX: 'left',
+            originY: 'top'
+          })
+        });
+
         State.fCanvas.add(fImg);
-        State.fCanvas.sendBackwards(fImg); 
-      };
-    }
-    loadFrame('img/polaroid/frame1.png');
+        State.fCanvas.sendBackwards(fImg); // 丟到底層
+      });
+    });
+
+    // 3. 載入對應排版的預設相框 (根據 layoutType 抓取不同資料夾)
+    const defaultFrame = State.layoutType === 'polaroid' 
+      ? 'img/polaroid/frame1.png' 
+      : 'img/korean4x1/frame1.png';
+    loadFrame(defaultFrame);
   }
 
   // 載入相框圖層
@@ -147,20 +204,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // [第二階段] 拍照
   UI.btnCapture.addEventListener('click', () => {
-    UI.hiddenCanvas.width = UI.video.videoWidth;
-    UI.hiddenCanvas.height = UI.video.videoHeight;
-    UI.ctx.drawImage(UI.video, 0, 0, UI.hiddenCanvas.width, UI.hiddenCanvas.height);
+    const config = LayoutConfig[State.layoutType]; // 取得目前排版的設定
     
-    const photoDataUrl = UI.hiddenCanvas.toDataURL('image/png');
-    State.capturedPhotos.push(photoDataUrl);
-    
-    // 顯示預覽圖與進入編輯按鈕
-    const img = document.createElement('img');
-    img.src = photoDataUrl;
-    img.style.height = '100px';
-    img.style.borderRadius = '8px';
-    UI.photoGallery.appendChild(img);
-    UI.btnGoEdit.style.display = 'block'; 
+    // 如果還沒拍滿，才執行拍照
+    if (State.capturedPhotos.length < config.maxPhotos) {
+      UI.hiddenCanvas.width = UI.video.videoWidth;
+      UI.hiddenCanvas.height = UI.video.videoHeight;
+      
+      // 擷取畫面
+      UI.ctx.drawImage(UI.video, 0, 0, UI.hiddenCanvas.width, UI.hiddenCanvas.height);
+      const photoDataUrl = UI.hiddenCanvas.toDataURL('image/png');
+      State.capturedPhotos.push(photoDataUrl);
+      
+      // 在下方顯示預覽小圖
+      const img = document.createElement('img');
+      img.src = photoDataUrl;
+      img.style.height = '60px';
+      img.style.borderRadius = '4px';
+      UI.photoGallery.appendChild(img);
+    }
+
+    // UX 回饋：如果拍滿了，顯示進入編輯按鈕，並隱藏拍照按鈕
+    if (State.capturedPhotos.length === config.maxPhotos) {
+      UI.btnGoEdit.style.display = 'block';
+      UI.btnCapture.style.display = 'none'; // 拍滿就不能再拍了
+    } else {
+      // (選做) 若是 4x1，可以更新按鈕文字提示進度
+      UI.btnCapture.innerText = `📸 拍照 (${State.capturedPhotos.length}/${config.maxPhotos})`;
+    }
   });
 
   // [第二階段] 進入編輯
