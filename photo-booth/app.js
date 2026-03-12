@@ -22,7 +22,9 @@ document.addEventListener('DOMContentLoaded', () => {
       // 定義照片要放進去的「挖洞」座標與大小 (對應 900x1200)
       slots: [
         { x: 40, y: 40, width: 280, height: 373.3 } 
-      ]
+      ],
+      // 這裡放入拍立得專用的相框路徑
+      frames: ['img/polaroid/frame1.png', 'img/polaroid/frame2.png']
     },
     korean4x1: {
       canvasWidth: 200,   // 對應真實 600px
@@ -34,7 +36,9 @@ document.addEventListener('DOMContentLoaded', () => {
         { x: 20, y: 146.7, width: 160, height: 120 },
         { x: 20, y: 273.3, width: 160, height: 120 },
         { x: 20, y: 400, width: 160, height: 120 }
-      ]
+      ],
+      // 這裡放入 4x1 專用的相框路徑
+      frames: ['img/korean4x1/frame1.png', 'img/korean4x1/frame2.png']
     }
   };
 
@@ -99,6 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!State.fCanvas) {
        State.fCanvas = new fabric.Canvas('editor-canvas');
+       setupCanvasEvents(); // 初始化時綁定畫布事件 (稍後實作)
     }
     // 1. 動態設定畫布大小
     State.fCanvas.setWidth(config.canvasWidth);
@@ -135,17 +140,41 @@ document.addEventListener('DOMContentLoaded', () => {
             absolutePositioned: true         // 絕對座標模式
           })
         });
-        
+
         State.fCanvas.add(fImg);
         State.fCanvas.sendBackwards(fImg); // 丟到底層
       });
     });
 
-    // 3. 載入對應排版的預設相框 (根據 layoutType 抓取不同資料夾)
-    const defaultFrame = State.layoutType === 'polaroid' 
-      ? 'img/polaroid/frame1.png' 
-      : 'img/korean4x1/frame1.png';
-    loadFrame(defaultFrame);
+    // ✨ 3. 動態生成相框選單
+    const frameListContainer = document.getElementById('frame-list');
+    // 重置容器，保留標題
+    frameListContainer.innerHTML = '<p style="font-size: 14px; font-weight: bold; line-height: 40px; margin-right: 8px;">相框</p>'; 
+
+    config.frames.forEach((frameUrl, index) => {
+      const img = document.createElement('img');
+      img.src = frameUrl;
+      img.className = 'btn-frame';
+      img.style.height = '60px';
+      img.style.cursor = 'pointer';
+      img.style.border = '2px solid transparent';
+      img.style.borderRadius = '4px';
+
+      // 預設自動載入並選中第一個相框
+      if (index === 0) {
+        img.style.borderColor = 'var(--primary-color)';
+        loadFrame(frameUrl); 
+      }
+
+      // 綁定點擊切換事件
+      img.addEventListener('click', (e) => {
+        loadFrame(frameUrl);
+        frameListContainer.querySelectorAll('.btn-frame').forEach(btn => btn.style.borderColor = 'transparent');
+        e.target.style.borderColor = 'var(--primary-color)';
+      });
+
+      frameListContainer.appendChild(img);
+    });
   }
 
   // 載入相框圖層
@@ -247,16 +276,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initEditor();
   });
 
-  // [第三階段] 切換相框
-  document.querySelectorAll('.btn-frame').forEach(frameBtn => {
-    frameBtn.addEventListener('click', (e) => {
-      const selectedFrameUrl = e.target.getAttribute('src');
-      loadFrame(selectedFrameUrl);
-      document.querySelectorAll('.btn-frame').forEach(btn => btn.style.borderColor = 'transparent');
-      e.target.style.borderColor = 'var(--primary-color)';
-    });
-  });
-
   // [第三階段] 新增貼紙
   document.querySelectorAll('.btn-sticker').forEach(btn => {
     btn.addEventListener('click', (e) => {
@@ -272,6 +291,47 @@ document.addEventListener('DOMContentLoaded', () => {
       State.fCanvas.add(sticker);
       State.fCanvas.setActiveObject(sticker); 
     });
+  });
+
+  // ==========================================
+  // 5. 畫布互動與貼紙刪除邏輯
+  // ==========================================
+  const btnDeleteObj = document.getElementById('btn-delete-obj');
+
+  // 監聽畫布的選取狀態，來決定是否顯示刪除按鈕
+  function setupCanvasEvents() {
+    // 當選取了物件
+    State.fCanvas.on('selection:created', () => { btnDeleteObj.style.display = 'block'; });
+    State.fCanvas.on('selection:updated', () => { btnDeleteObj.style.display = 'block'; });
+    // 當取消選取物件
+    State.fCanvas.on('selection:cleared', () => { btnDeleteObj.style.display = 'none'; });
+  }
+
+  // 手機版 UI：點擊垃圾桶按鈕刪除
+  btnDeleteObj.addEventListener('click', () => {
+    const activeObjects = State.fCanvas.getActiveObjects();
+    if (activeObjects.length) {
+      State.fCanvas.discardActiveObject(); // 取消選取框
+      activeObjects.forEach(function(object) {
+        State.fCanvas.remove(object);      // 從畫布移除
+      });
+    }
+  });
+
+  // 電腦版 UX：支援鍵盤 Delete / Backspace 鍵刪除 (方便開發與桌機用戶)
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Delete' || e.key === 'Backspace') {
+      // 避免在有 input 輸入框時誤觸 (雖然目前沒有，但這是好習慣)
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      
+      if (State.fCanvas && State.fCanvas.getActiveObjects().length > 0) {
+        const activeObjects = State.fCanvas.getActiveObjects();
+        State.fCanvas.discardActiveObject();
+        activeObjects.forEach(function(object) {
+          State.fCanvas.remove(object);
+        });
+      }
+    }
   });
 
 });

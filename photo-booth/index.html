@@ -73,12 +73,16 @@
       <canvas id="editor-canvas"></canvas>
     </div>
 
-    <div class="frame-bar" style="display: flex; gap: 12px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 8px;">
-      <p style="font-size: 14px; font-weight: bold; line-height: 40px; margin-right: 8px;">相框</p>
-      <img src="img/polaroid/frame1.png" class="btn-frame" style="height: 60px; cursor: pointer; border: 2px solid transparent; border-radius: 4px;">
-      <img src="img/polaroid/frame2.png" class="btn-frame" style="height: 60px; cursor: pointer; border: 2px solid transparent; border-radius: 4px;">
+    <div id="frame-list" class="frame-bar" style="display: flex; gap: 12px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 8px;">
     </div>
 
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+      <p style="font-size: 14px; font-weight: bold; margin-left: 8px;">貼紙</p>
+      <button id="btn-delete-obj" class="btn-secondary" style="width: auto; padding: 4px 12px; font-size: 14px; margin-top: 0; display: none; color: #ff4d4f; border-color: #ff4d4f; background: #fff;">
+        🗑️ 刪除選取貼紙
+      </button>
+    </div>
+    
     <div class="sticker-bar" style="display: flex; gap: 12px; margin-bottom: 24px; overflow-x: auto; padding-bottom: 8px;">
       <button class="btn-sticker btn-secondary" style="width:auto; padding:8px 16px; border-radius:30px; font-size: 24px;">🌟</button>
       <button class="btn-sticker btn-secondary" style="width:auto; padding:8px 16px; border-radius:30px; font-size: 24px;">💖</button>
