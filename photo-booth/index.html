@@ -47,10 +47,19 @@
     <header>
       <h1>準備拍攝</h1>
     </header>
+    
+    <button id="btn-switch-cam" class="btn-secondary">🔄 切換前後鏡頭</button>
+
     <div class="camera-viewport">
-      <p>📷 這裡之後會放 Video 標籤</p>
+      <video id="camera-stream" autoplay playsinline style="width: 100%; height: 100%; object-fit: cover;"></video>
     </div>
+
+    <button id="btn-capture" class="btn-primary">📸 拍照</button>
     <button id="btn-back" class="btn-secondary">返回重選</button>
+
+    <canvas id="capture-canvas" style="display: none;"></canvas>
+    
+    <div id="photo-gallery" style="display: flex; gap: 8px; margin-top: 16px; overflow-x: auto;"></div>
   </section>
 
   <script src="app.js"></script>
