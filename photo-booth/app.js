@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
         { x: 20, y: 400, width: 160, height: 120 }
       ],
       // 這裡放入 4x1 專用的相框路徑
-      frames: ['img/korean4x1/frame1.png', 'img/korean4x1/frame2.png', 'img/korean4x1/frame3.png']
+      frames: ['img/korean4x1/frame1.png', 'img/korean4x1/frame2.png', 'img/korean4x1/frame3.png', 'img/korean4x1/frame4.png', 'img/korean4x1/frame5.png', 'img/korean4x1/frame6.png']
     }
   };
 
