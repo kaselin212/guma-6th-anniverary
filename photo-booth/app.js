@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
         { x: 40, y: 40, width: 280, height: 373.3 } 
       ],
       // 這裡放入拍立得專用的相框路徑
-      frames: ['img/polaroid/frame1.png', 'img/polaroid/frame2.png']
+      frames: ['img/polaroid/frame1.png', 'img/polaroid/frame2.png', 'img/polaroid/frame3.png']
     },
     korean4x1: {
       canvasWidth: 200,   // 對應真實 600px
@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
         { x: 20, y: 400, width: 160, height: 120 }
       ],
       // 這裡放入 4x1 專用的相框路徑
-      frames: ['img/korean4x1/frame1.png', 'img/korean4x1/frame2.png']
+      frames: ['img/korean4x1/frame1.png', 'img/korean4x1/frame2.png', 'img/korean4x1/frame3.png']
     }
   };
 
