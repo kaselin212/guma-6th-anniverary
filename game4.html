@@ -4,24 +4,40 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chapter 4: The Steal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cherry+Bomb+One&family=Forum&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="game.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
-    <div style="width: 100%; max-width: 800px; text-align: center;">
-        <div style="margin-bottom: 10px; display: flex; justify-content: space-between;">
-            <a href="index.html" class="btn" style="padding: 5px 15px; font-size: 1rem;">← Menu</a>
-            <div style="color: #888;">等待血量進入斬殺線，按 <span style="color: var(--t1-gold); font-weight:bold;">SPACE</span> 或 <span style="color: var(--t1-gold); font-weight:bold;">點擊</span> 搶奪！</div>
+    <img src="guma-logo.png" alt="Gumayusi" class="top-left-logo">
+
+    <div class="game-wrapper">
+        <div class="game-header">
+            <div class="header-top">
+                <a href="index.html" class="pill-btn secondary"><i class="fa-solid fa-arrow-left"></i> 返回主畫面</a>
+            </div>
+            <div class="header-bottom">
+                <div class="game-title">
+                    <span class="chap">Chapter. 4</span>
+                    <span class="tw">偷龍之神</span>
+                    <span class="en">The God of Steal</span>
+                </div>
+                <div class="game-objective">
+                    任務 4：等待血量進入斬殺線，按 SPACE 或點擊搶奪！ ( LEVEL: <span id="level-val" style="color: var(--color-pink); font-weight: bold;">1</span> / 5 )
+                </div>
+            </div>
         </div>
 
         <div id="game-container" class="mode-steal">
             <div style="position: absolute; bottom: 20px; right: 20px; text-align: center; opacity: 0.7;">
-                <div style="border: 2px solid #555; width: 50px; height: 50px; display:flex; align-items:center; justify-content:center; border-radius: 4px; background: #222;">
-                    <i class="fa-solid fa-bow-arrow" style="font-size: 24px; color: var(--t1-red);"></i>
+                <div style="border: 2px solid var(--color-blue); width: 50px; height: 50px; display:flex; align-items:center; justify-content:center; border-radius: 4px; background: rgba(255,255,255,0.1);">
+                    <i class="fa-solid fa-bow-arrow" style="font-size: 24px; color: var(--color-blue);"></i>
                 </div>
-                <div style="font-size: 12px; margin-top: 5px; color: #888;">SPACE</div>
+                <div style="font-size: 12px; margin-top: 5px; color: var(--color-blue);">SPACE</div>
             </div>
 
             <div class="objective-boss">
@@ -34,34 +50,40 @@
             </div>
 
             <div id="result-text" class="result-text">STOLEN!</div>
-            
-            <div id="ui-layer">
-                <div class="stat-box">LEVEL: <span id="level-val" style="color: var(--t1-gold);">1</span>/5</div>
-            </div>
         </div>
     </div>
 
-    <div id="victory-modal" class="modal-overlay">
-        <div class="modal-card">
-            <div class="modal-header">
-                <h2>CHAPTER 4 CLEARED</h2>
-                <div class="sub-title">THE GOD OF STEAL</div>
-            </div>
-            <div class="modal-body">
-                <div class="memory-image-placeholder">
-                    <span style="font-size: 3rem; color: #E4002B;">2022</span>
-                    <p>Worlds Finals - The Varus Steal</p>
+    <div id="victory-modal" class="result-modal">
+        <div class="result-content">
+            <img src="guma-logo.png" alt="Gumayusi" class="result-logo">
+
+            <div class="result-header">
+                <div class="result-title-group">
+                    <h2 class="result-chapter">Chapter. 4</h2>
+                    <div class="cleared-stamp">Cleared</div>
                 </div>
-                <p class="story-text">
-                    "Gumayusi stole it again!"<br>
-                    他是世界上最冷靜的偷龍者。<br>
-                    即使在絕境中，他也能創造奇蹟，<br>
-                    為隊伍保留最後一線生機。
-                </p>
+                <div class="result-date">2022 Worlds Finals</div>
             </div>
-            <div class="modal-footer">
-                <button onclick="location.reload()" class="btn-small">↺ Replay</button>
-                <a href="result.html" class="btn-small filled">查看總結算與排行榜 →</a>
+
+            <div class="video-container" style="display:flex; justify-content:center; align-items:center; background:#111; height:200px; border-radius:10px; margin-bottom:20px; font-size:3rem; color:#E4002B; font-weight:bold;">
+                2022
+            </div>
+
+            <h3 class="result-nickname">The God of Steal</h3>
+            <p class="result-story">
+                "Gumayusi stole it again!"<br>
+                他是世界上最冷靜的偷龍者。<br>
+                即使在絕境中，他也能創造奇蹟，<br>
+                為隊伍保留最後一線生機。
+            </p>
+
+            <div class="result-score-box">
+                累計表現評分 : <span id="current-total-score" class="score-number">0</span>
+            </div>
+
+            <div class="result-actions">
+                <button onclick="location.reload()" class="pill-btn outline">↺ 重新遊玩</button>
+                <a href="result.html" class="pill-btn outline">查看總結算與排行榜 →</a>
             </div>
         </div>
     </div>

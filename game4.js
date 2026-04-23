@@ -199,11 +199,13 @@ function endGame(success, failReason = "STOLEN BY ENEMY") {
             } else {
                 // --- 第四關的 5 小關全破，進行最終總結算 ---
                 let total = parseInt(sessionStorage.getItem('guma_current_score')) || 0;
-                sessionStorage.setItem('guma_current_score', total + Math.floor(game4TotalScore));
+                let newTotal = total + Math.floor(game4TotalScore);
+                sessionStorage.setItem('guma_current_score', newTotal);
+
+                document.getElementById('current-total-score').innerText = newTotal;
 
                 const modal = document.getElementById('victory-modal');
-                modal.style.display = 'flex';
-                setTimeout(() => modal.classList.add('show'), 10);
+                modal.classList.add('show');
             }
         }, 1500); 
         

@@ -282,11 +282,13 @@ function gameWin() {
     
     // 讀取之前的分數，並疊加
     let total = parseInt(sessionStorage.getItem('guma_current_score')) || 0;
-    sessionStorage.setItem('guma_current_score', total + levelScore);
+    let newTotal = total + levelScore;
+    sessionStorage.setItem('guma_current_score', newTotal);
+
+    document.getElementById('current-total-score').innerText = newTotal;
 
     const modal = document.getElementById('victory-modal');
-    modal.style.display = 'flex';
-    setTimeout(() => modal.classList.add('show'), 10);
+    modal.classList.add('show');
 }
 
 function gameOver() {
