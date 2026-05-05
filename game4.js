@@ -29,6 +29,21 @@ let damageInterval;
 // 初始化
 resetLevel();
 
+let isTutorialCompleted = false;
+
+function startGame() {
+    const tutorialModal = document.getElementById('tutorial-modal');
+    tutorialModal.classList.remove('show');
+    setTimeout(() => {
+        tutorialModal.style.display = 'none';
+        isTutorialCompleted = true;
+        setTimeout(() => {
+            gameActive = true;
+            startDamageLoop();
+        }, 1000);
+    }, 400);
+}
+
 // 監聽按鍵 (空白鍵) 與 點擊
 window.addEventListener('keydown', (e) => {
     if (e.code === 'Space' && !isStealing && gameActive) {
@@ -55,11 +70,13 @@ function resetLevel() {
     
     isStealing = false;
     
-    // 倒數 1 秒後開始掉血
-    setTimeout(() => {
-        gameActive = true;
-        startDamageLoop();
-    }, 1000);
+    if (currentLevel > 1 || isTutorialCompleted) {
+        // 倒數 1 秒後開始掉血
+        setTimeout(() => {
+            gameActive = true;
+            startDamageLoop();
+        }, 1000);
+    }
 }
 
 function startDamageLoop() {

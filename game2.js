@@ -7,7 +7,17 @@ const ammoEl = document.getElementById('ammo-val');
 let score = 0;
 const TARGET_SCORE = 15; 
 let ammo = 30; 
-let gameActive = true;
+let gameActive = false;
+
+function startGame() {
+    const tutorialModal = document.getElementById('tutorial-modal');
+    tutorialModal.classList.remove('show');
+    setTimeout(() => {
+        tutorialModal.style.display = 'none';
+        gameActive = true;
+        gameLoop();
+    }, 400);
+}
 
 // 畫面中心點 (800x600)
 const CENTER_X = 400;
@@ -241,5 +251,3 @@ function gameWin() {
 setInterval(() => {
     if (enemies.length < 8 && gameActive) spawnEnemy();
 }, 800);
-
-gameLoop();

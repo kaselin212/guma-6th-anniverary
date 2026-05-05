@@ -6,10 +6,21 @@ const bossHpFill = document.getElementById('boss-hp-fill');
 const playerHpEl = document.getElementById('player-hp');
 
 // --- 遊戲參數 ---
-let gameActive = true;
+let gameActive = false;
 const PLAYER_RANGE = 250; 
 const ATTACK_SPEED = 400; 
 let lastAttackTime = 0;
+
+function startGame() {
+    const tutorialModal = document.getElementById('tutorial-modal');
+    tutorialModal.classList.remove('show');
+    setTimeout(() => {
+        tutorialModal.style.display = 'none';
+        gameActive = true;
+        requestAnimationFrame(gameLoop);
+    }, 400);
+}
+
 const PLAYER_MOVE_SPEED = 5; // 玩家移動速度 (數值越大跑越快)
 
 // 數值
@@ -296,5 +307,3 @@ function gameOver() {
     alert("走位失誤！Game Over");
     location.reload();
 }
-
-requestAnimationFrame(gameLoop);
