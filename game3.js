@@ -7,8 +7,8 @@ const playerHpEl = document.getElementById('player-hp');
 
 // --- 遊戲參數 ---
 let gameActive = false;
-const PLAYER_RANGE = 250; 
-const ATTACK_SPEED = 400; 
+const PLAYER_RANGE = 250;
+const ATTACK_SPEED = 400;
 let lastAttackTime = 0;
 
 function startGame() {
@@ -49,7 +49,7 @@ updatePlayerView(); // 先更新一次初始位置
 // --- 1. 滑鼠點擊控制 (設定目標點) ---
 container.addEventListener('mousedown', (e) => {
     if (!gameActive) return;
-    
+
     // 取得點擊座標 (相對於遊戲容器)
     const rect = container.getBoundingClientRect();
     const clickX = e.clientX - rect.left;
@@ -70,7 +70,7 @@ function createClickMarker(x, y) {
     marker.style.left = x + 'px';
     marker.style.top = y + 'px';
     container.appendChild(marker);
-    
+
     // 動畫播完後移除 DOM
     setTimeout(() => marker.remove(), 500);
 }
@@ -86,13 +86,11 @@ function updatePlayerMovement() {
     if (dist > PLAYER_MOVE_SPEED) {
         // 計算移動向量 (Normalize)
         const angle = Math.atan2(dy, dx);
-        
+
         playerX += Math.cos(angle) * PLAYER_MOVE_SPEED;
         playerY += Math.sin(angle) * PLAYER_MOVE_SPEED;
 
-        // 角色轉身面向移動方向 (選用，如果不喜歡一直轉可以拿掉)
-        // 加上 +90度 是因為圖示預設角度問題，視情況調整
-        player.style.transform = `translate(-50%, -50%) rotate(${angle * (180/Math.PI) + 90}deg)`;
+        // 角色取消旋轉，只需依賴 CSS 的 translate(-50%, -50%)
     } else {
         // 距離很近了，直接吸附到目標點，避免抖動
         playerX = targetX;
@@ -105,7 +103,7 @@ function updatePlayerMovement() {
 function updatePlayerView() {
     player.style.left = playerX + 'px';
     player.style.top = playerY + 'px';
-    
+
     rangeCircle.style.left = playerX + 'px';
     rangeCircle.style.top = playerY + 'px';
 }
@@ -148,8 +146,8 @@ let bossSkillTimer = 0;
 
 function updateBoss() {
     bossMoveTimer++;
-    bossX = 400 + Math.sin(bossMoveTimer * 0.02) * 300; 
-    
+    bossX = 400 + Math.sin(bossMoveTimer * 0.02) * 300;
+
     boss.style.left = bossX + 'px';
     boss.style.top = bossY + 'px';
 
@@ -159,15 +157,15 @@ function updateBoss() {
     if (bossHp < 500) cooldown = 100;
     if (bossHp < 250) cooldown = 60;
 
-    if (bossSkillTimer > cooldown) { 
+    if (bossSkillTimer > cooldown) {
         castSkill();
-        bossSkillTimer = 0; 
+        bossSkillTimer = 0;
     }
 }
 
 function castSkill() {
     const type = Math.random();
-    
+
     if (type < 0.3) {
         createSkillshot(bossX, bossY, playerX, playerY, 'line'); // 預判? 不，先瞄準當前位置
     } else if (type < 0.7) {
@@ -204,7 +202,7 @@ function createSkillshot(x, y, tx, ty, type) {
     }
 
     const angle = Math.atan2(ty - y, tx - x);
-    
+
     enemySkills.push({
         el: el,
         x: x,
@@ -232,7 +230,7 @@ function gameLoop(timestamp) {
         const angle = Math.atan2(bossY - b.y, bossX - b.x);
         b.x += Math.cos(angle) * b.speed;
         b.y += Math.sin(angle) * b.speed;
-        
+
         b.el.style.left = b.x + 'px';
         b.el.style.top = b.y + 'px';
 
@@ -252,15 +250,15 @@ function gameLoop(timestamp) {
         const s = enemySkills[i];
         s.x += s.vx;
         s.y += s.vy;
-        
+
         s.el.style.left = s.x + 'px';
         s.el.style.top = s.y + 'px';
-        
+
         if (s.type === 'line') {
-             const angle = Math.atan2(s.vy, s.vx);
-             s.el.style.transform = `translate(-50%, -50%) rotate(${angle + Math.PI/2}rad)`;
+            const angle = Math.atan2(s.vy, s.vx);
+            s.el.style.transform = `translate(-50%, -50%) rotate(${angle + Math.PI / 2}rad)`;
         } else {
-             s.el.style.transform = `translate(-50%, -50%)`;
+            s.el.style.transform = `translate(-50%, -50%)`;
         }
 
         if (s.y > 650 || s.x < -50 || s.x > 850) {
@@ -286,11 +284,11 @@ function gameLoop(timestamp) {
 
 function gameWin() {
     gameActive = false;
-    
+
     // --- 計算第三關分數 ---
     let hpBonus = Math.max(0, playerHp) * 15; // 滿血(100)可以拿到額外 1500 分
     let levelScore = 1000 + hpBonus;
-    
+
     // 讀取之前的分數，並疊加
     let total = parseInt(sessionStorage.getItem('guma_current_score')) || 0;
     let newTotal = total + levelScore;
