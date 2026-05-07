@@ -1,5 +1,4 @@
 const container = document.getElementById('game-container');
-const playerRotator = document.getElementById('player-rotate-layer'); 
 const scoreEl = document.getElementById('score-val');
 const ammoEl = document.getElementById('ammo-val');
 
@@ -28,16 +27,12 @@ let enemies = [];
 let mouseX = CENTER_X;
 let mouseY = CENTER_Y;
 
-// 1. 玩家瞄準 (純旋轉)
+// 1. 玩家瞄準
 container.addEventListener('mousemove', (e) => {
     if (!gameActive) return;
     const rect = container.getBoundingClientRect();
     mouseX = e.clientX - rect.left;
     mouseY = e.clientY - rect.top;
-
-    const angle = Math.atan2(mouseY - CENTER_Y, mouseX - CENTER_X);
-    const deg = angle * (180 / Math.PI);
-    playerRotator.style.transform = `rotate(${deg + 45}deg)`;
 });
 
 // 2. 射擊機制
