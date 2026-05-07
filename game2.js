@@ -18,9 +18,15 @@ function startGame() {
     }, 400);
 }
 
-// 畫面中心點 (800x600)
-const CENTER_X = 400;
-const CENTER_Y = 300;
+// 畫面中心點
+let CENTER_X = 400;
+let CENTER_Y = 300;
+function updateCenter() {
+    CENTER_X = container.clientWidth / 2;
+    CENTER_Y = container.clientHeight / 2;
+}
+updateCenter();
+window.addEventListener('resize', updateCenter);
 
 let arrows = []; 
 let enemies = []; 
@@ -91,8 +97,8 @@ function spawnEnemy() {
     // --- 隨機位置 (避開玩家) ---
     let startX, startY, dist;
     do {
-        startX = Math.random() * 740 + 30; 
-        startY = Math.random() * 540 + 30;
+        startX = Math.random() * (container.clientWidth - 60) + 30; 
+        startY = Math.random() * (container.clientHeight - 60) + 30;
         dist = Math.hypot(startX - CENTER_X, startY - CENTER_Y);
     } while (dist < 100); // 至少距離 100px
 
@@ -106,8 +112,8 @@ function spawnEnemy() {
         
         // --- AI 參數 ---
         // 初始目標：隨機選一個點走過去
-        targetX: Math.random() * 740 + 30,
-        targetY: Math.random() * 540 + 30,
+        targetX: Math.random() * (container.clientWidth - 60) + 30,
+        targetY: Math.random() * (container.clientHeight - 60) + 30,
         
         speed: Math.random() * 1.5 + 1.5, // 移動速度 (1.5 ~ 3)
         rotation: 0,
@@ -128,7 +134,7 @@ function gameLoop() {
         arrow.el.style.left = arrow.x + 'px';
         arrow.el.style.top = arrow.y + 'px';
 
-        if (arrow.x < -50 || arrow.x > 850 || arrow.y < -50 || arrow.y > 650) {
+        if (arrow.x < -50 || arrow.x > container.clientWidth + 50 || arrow.y < -50 || arrow.y > container.clientHeight + 50) {
             arrow.el.remove();
             arrows.splice(i, 1);
         }
@@ -145,8 +151,8 @@ function gameLoop() {
         
         // 到達目標 OR 隨機 1% 機率突然改變心意 (Juking)
         if (distToTarget < 5 || Math.random() < 0.01) {
-            enemy.targetX = Math.random() * 740 + 30;
-            enemy.targetY = Math.random() * 540 + 30;
+            enemy.targetX = Math.random() * (container.clientWidth - 60) + 30;
+            enemy.targetY = Math.random() * (container.clientHeight - 60) + 30;
         }
 
         // --- 物理移動層 ---
