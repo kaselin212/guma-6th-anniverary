@@ -85,7 +85,7 @@ function spawnMinion() {
     minion.style.top = pos.y + 'px';
     
     // --- 換成您專屬的可愛小兵圖片 ---
-    minion.innerHTML = '<img src="game1-enemy.png" style="width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 5px 5px rgba(0,0,0,0.3));">';
+    minion.innerHTML = '<img src="img/game1-enemy.png" style="width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 5px 5px rgba(0,0,0,0.3));">';
     
     // 建立血條
     const hpContainer = document.createElement('div');
